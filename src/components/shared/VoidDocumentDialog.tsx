@@ -80,8 +80,8 @@ export function VoidDocumentDialog({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <Card className="w-full max-w-md mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClose}>
+      <Card className="w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Ban className="h-5 w-5 text-destructive" />

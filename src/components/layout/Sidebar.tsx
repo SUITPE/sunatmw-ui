@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Files, PlusCircle, Users, Settings,
-  PanelLeftClose, PanelLeftOpen, LogOut, FileText,
+  PanelLeftClose, PanelLeftOpen, LogOut, FileText, Receipt,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Documentos', icon: Files, path: '/documents' },
   { label: 'Emitir Factura', icon: PlusCircle, path: '/emit', roles: ['admin', 'facturador'] },
-  { label: 'Emitir Boleta', icon: FileText, path: '/emit-receipt', roles: ['admin', 'facturador'] },
+  { label: 'Emitir Boleta', icon: Receipt, path: '/emit-receipt', roles: ['admin', 'facturador'] },
   { label: 'Usuarios', icon: Users, path: '/users', roles: ['admin'] },
   { label: 'Configuracion', icon: Settings, path: '/settings', roles: ['admin'] },
 ]

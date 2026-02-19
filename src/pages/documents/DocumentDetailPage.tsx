@@ -238,6 +238,7 @@ export default function DocumentDetailPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="text-amber-600 border-amber-300 hover:bg-amber-50"
                     onClick={() => navigate(`/emit-credit-note?ref=${doc.documentId}&type=${doc.type}`)}
                   >
                     <FileMinus2 className="h-4 w-4 mr-2" />Emitir NC
@@ -245,6 +246,7 @@ export default function DocumentDetailPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="text-blue-600 border-blue-300 hover:bg-blue-50"
                     onClick={() => navigate(`/emit-debit-note?ref=${doc.documentId}&type=${doc.type}`)}
                   >
                     <FilePlus2 className="h-4 w-4 mr-2" />Emitir ND
