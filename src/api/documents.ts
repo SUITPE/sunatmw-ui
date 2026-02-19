@@ -1,5 +1,18 @@
 import { api } from './client'
 import type { PaginatedResponse, Document } from '@/types'
+import type { EmitResult } from '@/api/invoices'
+
+export interface VoidDocumentInput {
+  issueDate: string
+  referenceDate: string
+  correlative: number
+  items: Array<{
+    series: string
+    correlative: number
+    documentType: string
+    reason: string
+  }>
+}
 
 interface DocumentQueryParams {
   page?: number
@@ -50,4 +63,22 @@ export async function downloadDocumentCdr(id: string): Promise<Blob> {
   const response = await api.get(`/api/documents/${id}/cdr`)
   if (!response.ok) throw new Error('Failed to download CDR')
   return response.blob()
+}
+
+export async function voidDocument(input: VoidDocumentInput): Promise<EmitResult> {
+  const response = await api.post('/api/voided-documents', input)
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ message: 'Error al anular documento' }))
+    throw new Error(err.message || 'Error al anular documento')
+  }
+  return response.json()
+}
+
+export async function checkTicket(id: string): Promise<Document> {
+  const response = await api.post(`/api/documents/${id}/check-ticket`, {})
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ message: 'Error al consultar ticket' }))
+    throw new Error(err.message || 'Error al consultar ticket')
+  }
+  return response.json()
 }

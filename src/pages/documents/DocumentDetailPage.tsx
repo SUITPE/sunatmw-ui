@@ -1,16 +1,19 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   ChevronRight, Code, FileCheck, Ban, FileX,
-  AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2,
+  AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2, RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { VoidDocumentDialog } from '@/components/shared/VoidDocumentDialog'
 import { useDocument } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
-import { downloadDocumentXml, downloadDocumentCdr } from '@/api/documents'
+import { downloadDocumentXml, downloadDocumentCdr, checkTicket } from '@/api/documents'
 import type { DocumentInput, DocumentItem } from '@/types'
 
 const DOC_TYPE_NAMES: Record<string, string> = {
@@ -96,9 +99,13 @@ function triggerDownload(blob: Blob, filename: string) {
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const user = useAuthStore((s) => s.user)
   const canVoid = user?.role === 'admin' || user?.role === 'facturador'
   const canEmitNotes = canVoid
+
+  const [voidDialogOpen, setVoidDialogOpen] = useState(false)
+  const [isCheckingTicket, setIsCheckingTicket] = useState(false)
 
   const { data: doc, isLoading, error } = useDocument(id!)
 
@@ -117,6 +124,23 @@ export default function DocumentDetailPage() {
     if (!doc) return
     const blob = await downloadDocumentCdr(doc.id)
     triggerDownload(blob, `R-${doc.documentId}.xml`)
+  }
+
+  const handleCheckTicket = async () => {
+    if (!doc) return
+    setIsCheckingTicket(true)
+    try {
+      await checkTicket(doc.id)
+      queryClient.invalidateQueries({ queryKey: ['document', id] })
+    } catch {
+      // silently fail — the user can retry
+    } finally {
+      setIsCheckingTicket(false)
+    }
+  }
+
+  const handleVoidSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['document', id] })
   }
 
   if (isLoading) {
@@ -228,7 +252,12 @@ export default function DocumentDetailPage() {
                 </>
               )}
               {doc.status === 'ACCEPTED' && canVoid && (
-                <Button variant="outline" size="sm" className="text-destructive border-destructive hover:bg-destructive/10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-destructive border-destructive hover:bg-destructive/10"
+                  onClick={() => setVoidDialogOpen(true)}
+                >
                   <Ban className="h-4 w-4 mr-2" />Anular
                 </Button>
               )}
@@ -464,10 +493,34 @@ export default function DocumentDetailPage() {
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Ticket SUNAT</p>
                   <p className="font-mono text-sm mt-1">{doc.sunatTicket}</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-amber-600">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Procesando...</span>
-                </div>
+                {doc.status !== 'ACCEPTED' && doc.status !== 'REJECTED' && doc.status !== 'VOIDED' ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-amber-600">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Procesando...</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCheckTicket}
+                      disabled={isCheckingTicket}
+                    >
+                      {isCheckingTicket ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Consultando...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Consultar Ticket
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Ticket procesado</p>
+                )}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Sin respuesta de SUNAT aun</p>
@@ -482,6 +535,16 @@ export default function DocumentDetailPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />Volver a Documentos
         </Button>
       </div>
+
+      {/* Void Document Dialog */}
+      <VoidDocumentDialog
+        open={voidDialogOpen}
+        onClose={() => setVoidDialogOpen(false)}
+        documentId={doc.documentId}
+        documentType={doc.type}
+        issueDate={input?.issueDate ?? ''}
+        onSuccess={handleVoidSuccess}
+      />
     </div>
   )
 }
