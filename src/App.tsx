@@ -6,6 +6,8 @@ import DocumentListPage from './pages/documents/DocumentListPage'
 import DocumentDetailPage from './pages/documents/DocumentDetailPage'
 import EmitInvoicePage from './pages/emit/EmitInvoicePage'
 import EmitReceiptPage from './pages/emit/EmitReceiptPage'
+import EmitCreditNotePage from './pages/emit/EmitCreditNotePage'
+import EmitDebitNotePage from './pages/emit/EmitDebitNotePage'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
 
@@ -43,6 +45,8 @@ function App() {
           <Route path="/documents/:id" element={<AuthenticatedLayout><DocumentDetailPage /></AuthenticatedLayout>} />
           <Route path="/emit" element={<AuthenticatedLayout><EmitInvoicePage /></AuthenticatedLayout>} />
           <Route path="/emit-receipt" element={<AuthenticatedLayout><EmitReceiptPage /></AuthenticatedLayout>} />
+          <Route path="/emit-credit-note" element={<AuthenticatedLayout><EmitCreditNotePage /></AuthenticatedLayout>} />
+          <Route path="/emit-debit-note" element={<AuthenticatedLayout><EmitDebitNotePage /></AuthenticatedLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

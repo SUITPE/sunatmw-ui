@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   ChevronRight, Code, FileCheck, Ban, FileX,
-  AlertTriangle, Loader2, ArrowLeft,
+  AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -98,6 +98,7 @@ export default function DocumentDetailPage() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const canVoid = user?.role === 'admin' || user?.role === 'facturador'
+  const canEmitNotes = canVoid
 
   const { data: doc, isLoading, error } = useDocument(id!)
 
@@ -207,6 +208,24 @@ export default function DocumentDetailPage() {
                 <Button variant="outline" size="sm" onClick={handleDownloadCdr}>
                   <FileCheck className="h-4 w-4 mr-2" />Descargar CDR
                 </Button>
+              )}
+              {doc.status === 'ACCEPTED' && canEmitNotes && (doc.type === '01' || doc.type === '03') && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/emit-credit-note?ref=${doc.documentId}&type=${doc.type}`)}
+                  >
+                    <FileMinus2 className="h-4 w-4 mr-2" />Emitir NC
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/emit-debit-note?ref=${doc.documentId}&type=${doc.type}`)}
+                  >
+                    <FilePlus2 className="h-4 w-4 mr-2" />Emitir ND
+                  </Button>
+                </>
               )}
               {doc.status === 'ACCEPTED' && canVoid && (
                 <Button variant="outline" size="sm" className="text-destructive border-destructive hover:bg-destructive/10">
