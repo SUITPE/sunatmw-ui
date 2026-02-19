@@ -27,3 +27,25 @@ export interface ApiError {
   statusCode: number
   error?: string
 }
+
+export interface Document {
+  id: string
+  type: string
+  series: string
+  correlative: number
+  documentId: string
+  status: string
+  cdrResponseCode: string | null
+  cdrDescription: string | null
+  createdAt: string
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
