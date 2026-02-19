@@ -1,23 +1,13 @@
 import { api } from './client'
+import type { AuthResponse } from '@/types'
 
 interface LoginRequest {
   email: string
   password: string
+  ruc: string
 }
 
-interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-    tenant: { id: string; name: string; ruc: string }
-  }
-}
-
-export async function login(credentials: LoginRequest): Promise<LoginResponse> {
+export async function login(credentials: LoginRequest): Promise<AuthResponse> {
   const response = await api.post('/auth/login', credentials)
 
   if (!response.ok) {

@@ -7,8 +7,8 @@ export function useAuth() {
   const navigate = useNavigate()
   const { user, isAuthenticated, login: storeLogin, logout: storeLogout } = useAuthStore()
 
-  const handleLogin = useCallback(async (email: string, password: string) => {
-    const response = await apiLogin({ email, password })
+  const handleLogin = useCallback(async (ruc: string, email: string, password: string) => {
+    const response = await apiLogin({ ruc, email, password })
     storeLogin(response.accessToken, response.refreshToken, response.user)
     navigate('/dashboard', { replace: true })
   }, [storeLogin, navigate])

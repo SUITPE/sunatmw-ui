@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { login as apiLogin } from '@/api/auth'
 
 interface FormErrors {
+  ruc?: string
   email?: string
   password?: string
 }
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const storeLogin = useAuthStore((s) => s.login)
 
+  const [ruc, setRuc] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -28,6 +30,11 @@ export default function LoginPage() {
 
   const validate = (): FormErrors => {
     const errors: FormErrors = {}
+    if (!ruc.trim()) {
+      errors.ruc = 'El RUC es obligatorio'
+    } else if (!/^\d{11}$/.test(ruc.trim())) {
+      errors.ruc = 'El RUC debe tener 11 digitos'
+    }
     if (!email.trim()) {
       errors.email = 'El correo electronico es obligatorio'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -39,6 +46,14 @@ export default function LoginPage() {
       errors.password = 'La contrasena debe tener al menos 8 caracteres'
     }
     return errors
+  }
+
+  const handleRucChange = (value: string) => {
+    setRuc(value.replace(/\D/g, '').slice(0, 11))
+    if (hasSubmitted) {
+      const errs = validate()
+      setFormErrors((prev) => ({ ...prev, ruc: errs.ruc }))
+    }
   }
 
   const handleEmailChange = (value: string) => {
@@ -68,7 +83,7 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      const response = await apiLogin({ email: email.trim(), password })
+      const response = await apiLogin({ ruc: ruc.trim(), email: email.trim(), password })
       storeLogin(response.accessToken, response.refreshToken, response.user)
       navigate('/dashboard', { replace: true })
     } catch (err: unknown) {
@@ -130,6 +145,32 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="ruc"
+                    className={formErrors.ruc ? 'text-destructive' : ''}
+                  >
+                    RUC de la empresa
+                  </Label>
+                  <Input
+                    id="ruc"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="20123456789"
+                    autoComplete="organization"
+                    value={ruc}
+                    onChange={(e) => handleRucChange(e.target.value)}
+                    className={formErrors.ruc ? 'border-destructive focus-visible:ring-destructive' : ''}
+                    aria-invalid={formErrors.ruc ? 'true' : undefined}
+                    aria-describedby={formErrors.ruc ? 'ruc-error' : undefined}
+                  />
+                  {formErrors.ruc && (
+                    <p id="ruc-error" className="text-sm text-destructive mt-1">
+                      {formErrors.ruc}
+                    </p>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label
                     htmlFor="email"
