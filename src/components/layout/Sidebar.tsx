@@ -18,7 +18,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Documentos', icon: Files, path: '/documents' },
-  { label: 'Emitir', icon: PlusCircle, path: '/emit', roles: ['admin', 'facturador'] },
+  { label: 'Emitir Factura', icon: PlusCircle, path: '/emit', roles: ['admin', 'facturador'] },
+  { label: 'Emitir Boleta', icon: FileText, path: '/emit-receipt', roles: ['admin', 'facturador'] },
   { label: 'Usuarios', icon: Users, path: '/users', roles: ['admin'] },
   { label: 'Configuracion', icon: Settings, path: '/settings', roles: ['admin'] },
 ]
