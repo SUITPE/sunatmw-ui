@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getDocuments } from '@/api/documents'
+import { getDocuments, getDocument } from '@/api/documents'
 
 interface UseDocumentsParams {
   page?: number
@@ -15,6 +15,14 @@ export function useDocuments(params: UseDocumentsParams = {}) {
     queryKey: ['documents', params],
     queryFn: () => getDocuments(params),
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useDocument(id: string) {
+  return useQuery({
+    queryKey: ['document', id],
+    queryFn: () => getDocument(id),
+    enabled: !!id,
   })
 }
 

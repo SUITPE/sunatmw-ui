@@ -39,3 +39,15 @@ export async function getDocument(id: string): Promise<Document> {
 
   return response.json()
 }
+
+export async function downloadDocumentXml(id: string): Promise<Blob> {
+  const response = await api.get(`/api/documents/${id}/xml`)
+  if (!response.ok) throw new Error('Failed to download XML')
+  return response.blob()
+}
+
+export async function downloadDocumentCdr(id: string): Promise<Blob> {
+  const response = await api.get(`/api/documents/${id}/cdr`)
+  if (!response.ok) throw new Error('Failed to download CDR')
+  return response.blob()
+}

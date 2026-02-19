@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LoginPage from './pages/login/LoginPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import DocumentListPage from './pages/documents/DocumentListPage'
+import DocumentDetailPage from './pages/documents/DocumentDetailPage'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
 
@@ -37,7 +38,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<AuthenticatedLayout><DashboardPage /></AuthenticatedLayout>} />
           <Route path="/documents" element={<AuthenticatedLayout><DocumentListPage /></AuthenticatedLayout>} />
-          <Route path="/documents/:id" element={<AuthenticatedLayout><div className="text-center py-24"><h1 className="text-2xl font-bold">Detalle de Documento</h1><p className="text-muted-foreground mt-2">Pagina en construccion (SUN-21)</p></div></AuthenticatedLayout>} />
+          <Route path="/documents/:id" element={<AuthenticatedLayout><DocumentDetailPage /></AuthenticatedLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

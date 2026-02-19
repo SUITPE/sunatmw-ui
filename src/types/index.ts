@@ -37,7 +37,45 @@ export interface Document {
   status: string
   cdrResponseCode: string | null
   cdrDescription: string | null
+  sunatTicket: string | null
+  jsonInput: DocumentInput | null
   createdAt: string
+  updatedAt: string
+}
+
+export interface DocumentCustomer {
+  identityType: string
+  identityNumber: string
+  name: string
+  address?: string
+}
+
+export interface DocumentItem {
+  code: string
+  description: string
+  quantity: number
+  unitCode: string
+  unitPrice: number
+  igvType: string
+  discount?: number
+  iscRate?: number
+}
+
+export interface DocumentInput {
+  series: string
+  correlative: number
+  issueDate: string
+  dueDate?: string
+  currencyCode: string
+  customer: DocumentCustomer
+  items: DocumentItem[]
+  paymentTerms?: string
+  observations?: string
+  purchaseOrder?: string
+  referenceDocumentId?: string
+  referenceDocumentType?: string
+  responseCode?: string
+  responseDescription?: string
 }
 
 export interface PaginatedResponse<T> {
