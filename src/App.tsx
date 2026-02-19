@@ -4,6 +4,7 @@ import LoginPage from './pages/login/LoginPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import DocumentListPage from './pages/documents/DocumentListPage'
 import DocumentDetailPage from './pages/documents/DocumentDetailPage'
+import EmitInvoicePage from './pages/emit/EmitInvoicePage'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/dashboard" element={<AuthenticatedLayout><DashboardPage /></AuthenticatedLayout>} />
           <Route path="/documents" element={<AuthenticatedLayout><DocumentListPage /></AuthenticatedLayout>} />
           <Route path="/documents/:id" element={<AuthenticatedLayout><DocumentDetailPage /></AuthenticatedLayout>} />
+          <Route path="/emit" element={<AuthenticatedLayout><EmitInvoicePage /></AuthenticatedLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
