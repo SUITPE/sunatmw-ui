@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUNAT Widget Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f8f9fa;
+    }
+    h1 { margin-bottom: 8px; }
+    p { color: #666; margin-bottom: 24px; }
+    .demo-section {
+      margin-bottom: 40px;
+    }
+    .demo-section h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SUNAT Widget Demo</h1>
+  <p>Ejemplo de integracion del web component <code>&lt;sunat-widget&gt;</code> en una pagina HTML externa.</p>
+
+  <div class="demo-section">
+    <h2>Light Theme</h2>
+    <sunat-widget
+      api-key="test-key"
+      api-url="http://localhost:3000"
+      theme="light"
+    ></sunat-widget>
+  </div>
+
+  <div class="demo-section">
+    <h2>Dark Theme</h2>
+    <sunat-widget
+      api-key="test-key"
+      api-url="http://localhost:3000"
+      theme="dark"
+    ></sunat-widget>
+  </div>
+
+  <!-- Load the widget bundle -->
+  <script src="/widget.js"></script>
+
+  <!-- Example: listen for the on-issued event -->
+  <script>
+    document.querySelectorAll('sunat-widget').forEach(function(widget) {
+      widget.addEventListener('on-issued', function(e) {
+        console.log('Comprobante emitido:', e.detail);
+        alert('Comprobante emitido: ' + e.detail.documentId + ' - Estado: ' + e.detail.status);
+      });
+    });
+  </script>
+</body>
+</html>
