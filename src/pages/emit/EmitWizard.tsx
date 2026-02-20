@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { CheckCircle2, XCircle, AlertTriangle, Plus, Trash2, Loader2, FileText, RotateCcw } from 'lucide-react'
+import { CheckCircle2, XCircle, AlertTriangle, Plus, Trash2, Loader2, FileText, RotateCcw, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,10 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import type { EmitInvoiceInput, EmitResult } from '@/api/invoices'
+import { searchClients } from '@/api/clients'
+import { searchProducts } from '@/api/products'
+import type { Client, Product } from '@/types'
+import { useAutocomplete } from '@/hooks/useAutocomplete'
 import {
   calcLineSubtotal,
   calcLineIGV,
@@ -130,6 +134,126 @@ const selectClassName =
   'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
 // ---------------------------------------------------------------------------
+// Autocomplete: Client search
+// ---------------------------------------------------------------------------
+
+interface ClientAutocompleteProps {
+  onSelectClient: (client: Client) => void
+}
+
+function ClientAutocomplete({ onSelectClient }: ClientAutocompleteProps) {
+  const ac = useAutocomplete<Client>({ searchFn: searchClients })
+
+  ac.onSelect.current = onSelectClient
+
+  return (
+    <div ref={ac.containerRef} className="relative">
+      <Label className="text-sm font-medium">Buscar cliente registrado</Label>
+      <div className="relative mt-1.5">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <input
+          type="text"
+          value={ac.query}
+          onChange={(e) => ac.setQuery(e.target.value)}
+          onKeyDown={ac.handleKeyDown}
+          placeholder="Buscar por nombre, RUC o DNI..."
+          className="flex h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        />
+        {ac.isLoading && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+        )}
+      </div>
+      {ac.isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+          {ac.results.length === 0 && !ac.isLoading ? (
+            <div className="px-3 py-2 text-sm text-muted-foreground">
+              No se encontraron resultados
+            </div>
+          ) : (
+            <ul className="max-h-60 overflow-auto py-1">
+              {ac.results.map((client, idx) => (
+                <li
+                  key={client.id}
+                  className={`cursor-pointer px-3 py-2 text-sm hover:bg-accent ${
+                    idx === ac.activeIndex ? 'bg-accent' : ''
+                  }`}
+                  onMouseDown={() => ac.selectItem(client)}
+                >
+                  <div className="font-medium">{client.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {client.documentType === '6' ? 'RUC' : 'DNI'}: {client.documentNumber}
+                    {client.address ? ` - ${client.address}` : ''}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Autocomplete: Product search (per item row)
+// ---------------------------------------------------------------------------
+
+interface ProductAutocompleteProps {
+  onSelectProduct: (product: Product) => void
+}
+
+function ProductAutocomplete({ onSelectProduct }: ProductAutocompleteProps) {
+  const ac = useAutocomplete<Product>({ searchFn: searchProducts })
+
+  ac.onSelect.current = onSelectProduct
+
+  return (
+    <div ref={ac.containerRef} className="relative">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <input
+          type="text"
+          value={ac.query}
+          onChange={(e) => ac.setQuery(e.target.value)}
+          onKeyDown={ac.handleKeyDown}
+          placeholder="Buscar producto del catalogo..."
+          className="flex h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        />
+        {ac.isLoading && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 animate-spin text-muted-foreground" />
+        )}
+      </div>
+      {ac.isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+          {ac.results.length === 0 && !ac.isLoading ? (
+            <div className="px-3 py-2 text-xs text-muted-foreground">
+              No se encontraron resultados
+            </div>
+          ) : (
+            <ul className="max-h-48 overflow-auto py-1">
+              {ac.results.map((product, idx) => (
+                <li
+                  key={product.id}
+                  className={`cursor-pointer px-3 py-2 text-xs hover:bg-accent ${
+                    idx === ac.activeIndex ? 'bg-accent' : ''
+                  }`}
+                  onMouseDown={() => ac.selectItem(product)}
+                >
+                  <div className="font-medium">{product.name}</div>
+                  <div className="text-muted-foreground">
+                    {product.code ? `${product.code} - ` : ''}S/ {parseFloat(product.unitPrice).toFixed(2)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Validation helpers
 // ---------------------------------------------------------------------------
 
@@ -214,6 +338,46 @@ export default function EmitWizard({ config }: EmitWizardProps) {
       items: prev.items.filter((item) => item.id !== id),
     }))
   }
+
+  // ---------------------------------------------------------------------------
+  // Autocomplete handlers
+  // ---------------------------------------------------------------------------
+
+  const handleSelectClient = useCallback(
+    (client: Client) => {
+      setForm((prev) => ({
+        ...prev,
+        customerDocType: client.documentType,
+        customerDocNumber: client.documentNumber,
+        customerName: client.name,
+        customerAddress: client.address ?? '',
+      }))
+      setStepError(null)
+    },
+    [],
+  )
+
+  const handleSelectProduct = useCallback(
+    (itemId: string, product: Product) => {
+      setForm((prev) => ({
+        ...prev,
+        items: prev.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                code: product.code ?? '',
+                description: product.name,
+                unitPrice: parseFloat(product.unitPrice) || 0,
+                unitCode: product.unitOfMeasure,
+                igvType: product.igvType,
+              }
+            : item,
+        ),
+      }))
+      setStepError(null)
+    },
+    [],
+  )
 
   // ---------------------------------------------------------------------------
   // Navigation
@@ -411,6 +575,18 @@ export default function EmitWizard({ config }: EmitWizardProps) {
           <CardTitle>Datos del Cliente</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Client autocomplete search */}
+          <ClientAutocomplete onSelectClient={handleSelectClient} />
+
+          {/* Divider */}
+          <div className="relative py-2">
+            <Separator />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
+              o completar manualmente
+            </span>
+          </div>
+
+          {/* Manual entry fields (unchanged) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="customerDocType">Tipo de Documento *</Label>
@@ -523,6 +699,10 @@ export default function EmitWizard({ config }: EmitWizardProps) {
                       </Button>
                     )}
                   </div>
+                  {/* Product autocomplete for mobile */}
+                  <ProductAutocomplete
+                    onSelectProduct={(product) => handleSelectProduct(item.id, product)}
+                  />
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <Label className="text-xs">Codigo</Label>
@@ -614,79 +794,86 @@ export default function EmitWizard({ config }: EmitWizardProps) {
                   </div>
                 </div>
 
-                {/* Desktop: row layout */}
-                <div className="hidden lg:grid lg:grid-cols-[60px_1fr_80px_110px_90px_110px_80px_100px_100px_40px] gap-2 items-center">
-                  <Input
-                    value={item.code}
-                    onChange={(e) => updateItem(item.id, 'code', e.target.value)}
-                    placeholder={`ITEM-${String(idx + 1).padStart(3, '0')}`}
-                    className="h-9 text-xs"
-                  />
-                  <Input
-                    value={item.description}
-                    onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                    placeholder="Descripcion"
-                    className="h-9 text-xs"
-                  />
-                  <Input
-                    type="number"
-                    min={0.01}
-                    step="any"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
-                    className="h-9 text-xs"
-                  />
-                  <select
-                    className={`${selectClassName} h-9 text-xs`}
-                    value={item.unitCode}
-                    onChange={(e) => updateItem(item.id, 'unitCode', e.target.value)}
-                  >
-                    <option value="NIU">Unidad</option>
-                    <option value="ZZ">Servicio</option>
-                  </select>
-                  <Input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={item.unitPrice}
-                    onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                    className="h-9 text-xs"
-                  />
-                  <select
-                    className={`${selectClassName} h-9 text-xs`}
-                    value={item.igvType}
-                    onChange={(e) => updateItem(item.id, 'igvType', e.target.value)}
-                  >
-                    <option value={IGV_TYPES.GRAVADO}>Gravado</option>
-                    <option value={IGV_TYPES.EXONERADO}>Exonerado</option>
-                    <option value={IGV_TYPES.INAFECTO}>Inafecto</option>
-                  </select>
-                  <Input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={item.discount}
-                    onChange={(e) => updateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
-                    className="h-9 text-xs"
-                  />
-                  <span className="text-right text-xs font-medium">
-                    {formatCurrency(subtotal, form.currencyCode)}
-                  </span>
-                  <span className="text-right text-xs font-medium">
-                    {formatCurrency(igv, form.currencyCode)}
-                  </span>
-                  <div className="flex justify-center">
-                    {form.items.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                {/* Desktop: product search + row layout */}
+                <div className="hidden lg:block space-y-2">
+                  <div className="max-w-sm">
+                    <ProductAutocomplete
+                      onSelectProduct={(product) => handleSelectProduct(item.id, product)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-[60px_1fr_80px_110px_90px_110px_80px_100px_100px_40px] gap-2 items-center">
+                    <Input
+                      value={item.code}
+                      onChange={(e) => updateItem(item.id, 'code', e.target.value)}
+                      placeholder={`ITEM-${String(idx + 1).padStart(3, '0')}`}
+                      className="h-9 text-xs"
+                    />
+                    <Input
+                      value={item.description}
+                      onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                      placeholder="Descripcion"
+                      className="h-9 text-xs"
+                    />
+                    <Input
+                      type="number"
+                      min={0.01}
+                      step="any"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                      className="h-9 text-xs"
+                    />
+                    <select
+                      className={`${selectClassName} h-9 text-xs`}
+                      value={item.unitCode}
+                      onChange={(e) => updateItem(item.id, 'unitCode', e.target.value)}
+                    >
+                      <option value="NIU">Unidad</option>
+                      <option value="ZZ">Servicio</option>
+                    </select>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={item.unitPrice}
+                      onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                      className="h-9 text-xs"
+                    />
+                    <select
+                      className={`${selectClassName} h-9 text-xs`}
+                      value={item.igvType}
+                      onChange={(e) => updateItem(item.id, 'igvType', e.target.value)}
+                    >
+                      <option value={IGV_TYPES.GRAVADO}>Gravado</option>
+                      <option value={IGV_TYPES.EXONERADO}>Exonerado</option>
+                      <option value={IGV_TYPES.INAFECTO}>Inafecto</option>
+                    </select>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={item.discount}
+                      onChange={(e) => updateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
+                      className="h-9 text-xs"
+                    />
+                    <span className="text-right text-xs font-medium">
+                      {formatCurrency(subtotal, form.currencyCode)}
+                    </span>
+                    <span className="text-right text-xs font-medium">
+                      {formatCurrency(igv, form.currencyCode)}
+                    </span>
+                    <div className="flex justify-center">
+                      {form.items.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => removeItem(item.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
