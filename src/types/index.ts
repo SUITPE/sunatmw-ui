@@ -103,6 +103,43 @@ export interface Client {
   updatedAt: string
 }
 
+export interface Receivable {
+  id: string
+  tenantId: string
+  clientId: string | null
+  documentId: string
+  invoiceNumber: string
+  totalAmount: string
+  paidAmount: string
+  balanceAmount: string
+  currency: string
+  issueDate: string
+  dueDate: string
+  status: 'pending' | 'partial' | 'paid' | 'overdue' | 'written_off'
+  lastReminderAt: string | null
+  reminderCount: number
+  createdAt: string
+  updatedAt: string
+  client: {
+    id: string
+    name: string
+    documentType: string
+    documentNumber: string
+  } | null
+}
+
+export interface Payment {
+  id: string
+  tenantId: string
+  receivableId: string
+  amount: string
+  paymentDate: string
+  paymentMethod: string
+  reference: string | null
+  notes: string | null
+  createdAt: string
+}
+
 export interface Product {
   id: string
   tenantId: string
