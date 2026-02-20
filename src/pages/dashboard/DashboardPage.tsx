@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { FileText, CheckCircle2, XCircle, Clock, PlusCircle } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { TrendingUp, Banknote, Clock, AlertTriangle, PlusCircle, FileText } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -8,30 +10,51 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { DocumentTypeBadge } from '@/components/shared/DocumentTypeBadge'
 import { useDashboardDocuments } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
+import { getDashboardSummary, getInvoicedVsCollected, getTopDebtors } from '@/api/reports'
+import type { DashboardSummary, MonthlyData, TopDebtor } from '@/api/reports'
 
-const statsCards = [
-  { title: 'Total Emitidos', icon: FileText, iconBg: 'bg-blue-100', iconColor: 'text-blue-600', countKey: 'total' },
-  { title: 'Aceptados', icon: CheckCircle2, iconBg: 'bg-green-100', iconColor: 'text-green-600', countKey: 'accepted', valueColor: 'text-green-600' },
-  { title: 'Rechazados', icon: XCircle, iconBg: 'bg-red-100', iconColor: 'text-red-600', countKey: 'rejected', valueColor: 'text-red-600' },
-  { title: 'Pendientes', icon: Clock, iconBg: 'bg-amber-100', iconColor: 'text-amber-600', countKey: 'pending', valueColor: 'text-amber-600' },
-] as const
-
-function computeStats(documents: Array<{ status: string }>) {
-  const total = documents.length
-  const accepted = documents.filter((d) => d.status === 'ACCEPTED').length
-  const rejected = documents.filter((d) => d.status === 'REJECTED').length
-  const pending = documents.filter((d) => ['PENDING', 'SENT'].includes(d.status)).length
-  return { total, accepted, rejected, pending }
+function formatCurrency(value: string | number): string {
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(num)) return 'S/ 0.00'
+  return `S/ ${num.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
+
+function formatMonthLabel(month: string): string {
+  const parts = month.split('-')
+  const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const monthIndex = parseInt(parts[1] ?? '1', 10) - 1
+  return `${monthNames[monthIndex]} ${(parts[0] ?? '').slice(2)}`
+}
+
+const REFETCH_INTERVAL = 5 * 60 * 1000
 
 export default function DashboardPage() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
-  const { data, isLoading } = useDashboardDocuments()
-
-  const documents = data?.data ?? []
-  const stats = computeStats(documents)
   const canEmit = user?.role === 'admin' || user?.role === 'facturador'
+
+  const { data: documentsData, isLoading: docsLoading } = useDashboardDocuments()
+  const documents = documentsData?.data ?? []
+
+  const { data: summary, isLoading: summaryLoading } = useQuery<DashboardSummary>({
+    queryKey: ['dashboard-summary'],
+    queryFn: getDashboardSummary,
+    refetchInterval: REFETCH_INTERVAL,
+  })
+
+  const { data: monthlyData, isLoading: monthlyLoading } = useQuery<MonthlyData[]>({
+    queryKey: ['invoiced-vs-collected'],
+    queryFn: () => getInvoicedVsCollected(6),
+    refetchInterval: REFETCH_INTERVAL,
+  })
+
+  const { data: topDebtors, isLoading: debtorsLoading } = useQuery<TopDebtor[]>({
+    queryKey: ['top-debtors'],
+    queryFn: () => getTopDebtors(5),
+    refetchInterval: REFETCH_INTERVAL,
+  })
+
+  const isLoading = summaryLoading || monthlyLoading || debtorsLoading || docsLoading
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr)
@@ -47,36 +70,54 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-32" />)}
         </div>
-        <Skeleton className="h-96" />
-      </div>
-    )
-  }
-
-  if (documents.length === 0) {
-    return (
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">Resumen de actividad de facturacion</p>
-        <div className="flex flex-col items-center justify-center py-24">
-          <FileText className="h-16 w-16 text-muted-foreground/30 mb-4" />
-          <h2 className="text-lg font-medium">Aun no tienes documentos</h2>
-          <p className="text-sm text-muted-foreground mt-1">Emite tu primer comprobante electronico para comenzar</p>
-          {canEmit && (
-            <Button className="mt-4" onClick={() => navigate('/emit')}>
-              <PlusCircle className="h-4 w-4 mr-2" />Emitir mi primer documento
-            </Button>
-          )}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Skeleton className="h-80 lg:col-span-2" />
+          <Skeleton className="h-80" />
         </div>
       </div>
     )
   }
+
+  const summaryCards = [
+    {
+      title: 'Facturado este mes',
+      value: formatCurrency(summary?.invoicedThisMonth ?? '0'),
+      icon: TrendingUp,
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+    },
+    {
+      title: 'Cobrado este mes',
+      value: formatCurrency(summary?.collectedThisMonth ?? '0'),
+      icon: Banknote,
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600',
+      valueColor: 'text-green-600',
+    },
+    {
+      title: 'Pendiente de cobro',
+      value: formatCurrency(summary?.pendingTotal ?? '0'),
+      icon: Clock,
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600',
+      valueColor: 'text-amber-600',
+    },
+    {
+      title: 'Vencido',
+      value: formatCurrency(summary?.overdueTotal ?? '0'),
+      icon: AlertTriangle,
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600',
+      valueColor: 'text-red-600',
+    },
+  ]
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-1">Resumen de actividad de facturacion</p>
+          <p className="text-muted-foreground text-sm mt-1">Resumen financiero y de facturacion</p>
         </div>
         {canEmit && (
           <Button onClick={() => navigate('/emit')}>
@@ -85,12 +126,12 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Financial Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statsCards.map((card) => {
+        {summaryCards.map((card) => {
           const Icon = card.icon
-          const count = stats[card.countKey]
           return (
-            <Card key={card.countKey}>
+            <Card key={card.title}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className={`rounded-full p-2 ${card.iconBg}`}>
@@ -98,15 +139,81 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">{card.title}</span>
                 </div>
-                <p className={`text-3xl font-bold mt-2 ${'valueColor' in card ? card.valueColor : ''}`}>{count}</p>
+                <p className={`text-2xl font-bold mt-2 ${card.valueColor ?? ''}`}>{card.value}</p>
               </CardContent>
             </Card>
           )
         })}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Chart and Top Debtors */}
+      <div className="grid lg:grid-cols-3 gap-6 mb-8">
         <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Facturado vs Cobrado (ultimos 6 meses)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {monthlyData && monthlyData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
+                  <YAxis tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip
+                    formatter={(value: number) => [formatCurrency(value), '']}
+                    labelFormatter={formatMonthLabel}
+                  />
+                  <Legend />
+                  <Bar dataKey="invoiced" name="Facturado" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="collected" name="Cobrado" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <TrendingUp className="h-10 w-10 mb-2 opacity-30" />
+                <p className="text-sm">Sin datos para este periodo</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Top Clientes Deudores</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topDebtors && topDebtors.length > 0 ? (
+              <div className="space-y-4">
+                {topDebtors.map((debtor, idx) => (
+                  <div key={debtor.documentNumber} className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-muted-foreground">#{idx + 1}</span>
+                        <p className="text-sm font-medium truncate">{debtor.clientName}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {debtor.documentNumber} - {debtor.invoiceCount} {debtor.invoiceCount === 1 ? 'factura' : 'facturas'}
+                      </p>
+                    </div>
+                    <span className="text-sm font-bold text-amber-600 whitespace-nowrap">
+                      {formatCurrency(debtor.pendingAmount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                <Banknote className="h-10 w-10 mb-2 opacity-30" />
+                <p className="text-sm">Sin deudores pendientes</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Documents */}
+      {documents.length > 0 && (
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-semibold">Ultimos Documentos</CardTitle>
             <Button variant="link" className="text-sm text-primary p-0 h-auto" onClick={() => navigate('/documents')}>
@@ -141,59 +248,27 @@ export default function DashboardPage() {
           </CardContent>
           <div className="p-4 border-t">
             <Button variant="link" className="text-sm text-primary p-0 h-auto" onClick={() => navigate('/documents')}>
-              Ver todos los documentos →
+              Ver todos los documentos
             </Button>
           </div>
         </Card>
+      )}
 
+      {documents.length === 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Por Tipo de Documento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DocumentTypeList documents={documents} />
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center">
+              <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">Aun no tienes documentos emitidos</p>
+              {canEmit && (
+                <Button className="mt-4" variant="outline" onClick={() => navigate('/emit')}>
+                  <PlusCircle className="h-4 w-4 mr-2" />Emitir mi primer documento
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  )
-}
-
-function DocumentTypeList({ documents }: { documents: Array<{ type: string }> }) {
-  const typeCounts: Record<string, number> = {}
-  for (const doc of documents) {
-    typeCounts[doc.type] = (typeCounts[doc.type] ?? 0) + 1
-  }
-
-  const typeNames: Record<string, string> = {
-    '01': 'Facturas', '03': 'Boletas', '07': 'Notas de Credito',
-    '08': 'Notas de Debito', '09': 'Guias', '20': 'Retenciones',
-    '40': 'Percepciones', 'RA': 'Com. de Baja',
-  }
-
-  const typeColors: Record<string, string> = {
-    '01': 'bg-blue-500', '03': 'bg-indigo-500', '07': 'bg-orange-500',
-    '08': 'bg-rose-500', '09': 'bg-teal-500', '20': 'bg-purple-500',
-    '40': 'bg-violet-500', 'RA': 'bg-gray-500',
-  }
-
-  const entries = Object.entries(typeCounts).sort(([, a], [, b]) => b - a)
-
-  return (
-    <div className="space-y-3">
-      {entries.map(([type, count]) => (
-        <div key={type} className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`h-2 w-2 rounded-full ${typeColors[type] ?? 'bg-gray-500'}`} />
-            <span className="text-sm">{typeNames[type] ?? type}</span>
-          </div>
-          <span className="text-sm font-medium">{count}</span>
-        </div>
-      ))}
-      <div className="flex items-center justify-between border-t pt-2 mt-2">
-        <span className="text-sm font-medium">Total</span>
-        <span className="text-sm font-bold">{documents.length}</span>
-      </div>
+      )}
     </div>
   )
 }
