@@ -11,8 +11,10 @@ import EmitDebitNotePage from './pages/emit/EmitDebitNotePage'
 import UsersPage from './pages/users/UsersPage'
 import ClientsPage from './pages/clients/ClientsPage'
 import ProductsPage from './pages/products/ProductsPage'
+import OnboardingWizard from './pages/onboarding/OnboardingWizard'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
+import { useOnboarding } from './hooks/useOnboarding'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,10 +31,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function OnboardingRedirect({ children }: { children: React.ReactNode }) {
+  const { needsOnboarding } = useOnboarding()
+  if (needsOnboarding) return <Navigate to="/onboarding" replace />
+  return <>{children}</>
+}
+
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
-      <AppLayout>{children}</AppLayout>
+      <OnboardingRedirect>
+        <AppLayout>{children}</AppLayout>
+      </OnboardingRedirect>
     </ProtectedRoute>
   )
 }
@@ -43,6 +53,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
           <Route path="/dashboard" element={<AuthenticatedLayout><DashboardPage /></AuthenticatedLayout>} />
           <Route path="/documents" element={<AuthenticatedLayout><DocumentListPage /></AuthenticatedLayout>} />
           <Route path="/documents/:id" element={<AuthenticatedLayout><DocumentDetailPage /></AuthenticatedLayout>} />
