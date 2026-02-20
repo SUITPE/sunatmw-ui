@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Files, PlusCircle, Users, Settings, LogOut, FileText, Receipt,
-  UserSearch, Package, Banknote,
+  UserSearch, Package, Banknote, Bell,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -23,6 +23,7 @@ const navItems: NavItem[] = [
   { label: 'Clientes', icon: UserSearch, path: '/clients' },
   { label: 'Productos', icon: Package, path: '/products' },
   { label: 'Cobranza', icon: Banknote, path: '/receivables' },
+  { label: 'Recordatorios', icon: Bell, path: '/reminders' },
   { label: 'Usuarios', icon: Users, path: '/users', roles: ['admin'] },
   { label: 'Configuracion', icon: Settings, path: '/settings', roles: ['admin'] },
 ]
