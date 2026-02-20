@@ -87,3 +87,33 @@ export interface PaginatedResponse<T> {
     totalPages: number
   }
 }
+
+export interface Client {
+  id: string
+  tenantId: string
+  documentType: string
+  documentNumber: string
+  name: string
+  tradeName: string | null
+  email: string | null
+  phone: string | null
+  address: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Product {
+  id: string
+  tenantId: string
+  code: string | null
+  name: string
+  description: string | null
+  unitPrice: string
+  unitOfMeasure: string
+  igvType: string
+  category: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}

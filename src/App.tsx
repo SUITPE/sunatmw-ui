@@ -9,6 +9,8 @@ import EmitReceiptPage from './pages/emit/EmitReceiptPage'
 import EmitCreditNotePage from './pages/emit/EmitCreditNotePage'
 import EmitDebitNotePage from './pages/emit/EmitDebitNotePage'
 import UsersPage from './pages/users/UsersPage'
+import ClientsPage from './pages/clients/ClientsPage'
+import ProductsPage from './pages/products/ProductsPage'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
 
@@ -49,6 +51,8 @@ function App() {
           <Route path="/emit-credit-note" element={<AuthenticatedLayout><EmitCreditNotePage /></AuthenticatedLayout>} />
           <Route path="/emit-debit-note" element={<AuthenticatedLayout><EmitDebitNotePage /></AuthenticatedLayout>} />
           <Route path="/users" element={<AuthenticatedLayout><UsersPage /></AuthenticatedLayout>} />
+          <Route path="/clients" element={<AuthenticatedLayout><ClientsPage /></AuthenticatedLayout>} />
+          <Route path="/products" element={<AuthenticatedLayout><ProductsPage /></AuthenticatedLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
