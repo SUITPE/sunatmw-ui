@@ -160,8 +160,8 @@ export default function DashboardPage() {
                   <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
                   <YAxis tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
-                    formatter={(value: number) => [formatCurrency(value), '']}
-                    labelFormatter={formatMonthLabel}
+                    formatter={(value: number | undefined) => [formatCurrency(value ?? 0), '']}
+                    labelFormatter={(label: unknown) => formatMonthLabel(String(label ?? ''))}
                   />
                   <Legend />
                   <Bar dataKey="invoiced" name="Facturado" fill="#3b82f6" radius={[4, 4, 0, 0]} />

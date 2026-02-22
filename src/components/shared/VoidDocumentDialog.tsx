@@ -44,8 +44,9 @@ export function VoidDocumentDialog({
     setIsSubmitting(true)
     setError(null)
 
-    const [series, corrStr] = documentId.split('-')
-    const correlative = parseInt(corrStr, 10)
+    const parts = documentId.split('-')
+    const series = parts[0] ?? ''
+    const correlative = parseInt(parts[1] ?? '0', 10)
 
     try {
       const res = await voidDocument({
