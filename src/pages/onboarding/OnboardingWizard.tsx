@@ -198,12 +198,12 @@ function StepCertificate({ onNext, onBack }: { onNext: () => void; onBack: () =>
               Es necesario para firmar electronicamente tus comprobantes de pago.
             </p>
             <a
-              href="https://www.sunat.gob.pe/ol-ti-itcertificadodigital/inscripcionCertificadoDigital.html"
+              href="https://www.gob.pe/26725-obtener-certificado-digital-tributario"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline text-sm inline-block"
             >
-              Ver documentacion de SUNAT sobre certificados digitales
+              Obtener certificado digital tributario (SUNAT)
             </a>
           </div>
         </CardContent>
