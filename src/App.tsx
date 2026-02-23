@@ -13,6 +13,7 @@ import ClientsPage from './pages/clients/ClientsPage'
 import ProductsPage from './pages/products/ProductsPage'
 import ReceivablesPage from './pages/receivables/ReceivablesPage'
 import RemindersPage from './pages/reminders/RemindersPage'
+import SettingsPage from './pages/settings/SettingsPage'
 import OnboardingWizard from './pages/onboarding/OnboardingWizard'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
@@ -68,6 +69,7 @@ function App() {
           <Route path="/products" element={<AuthenticatedLayout><ProductsPage /></AuthenticatedLayout>} />
           <Route path="/receivables" element={<AuthenticatedLayout><ReceivablesPage /></AuthenticatedLayout>} />
           <Route path="/reminders" element={<AuthenticatedLayout><RemindersPage /></AuthenticatedLayout>} />
+          <Route path="/settings" element={<AuthenticatedLayout><SettingsPage /></AuthenticatedLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

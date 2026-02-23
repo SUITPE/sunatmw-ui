@@ -40,6 +40,8 @@ export const api = {
   get: (url: string) => fetchWithAuth(url),
   post: (url: string, body: unknown) =>
     fetchWithAuth(url, { method: 'POST', body: JSON.stringify(body) }),
+  put: (url: string, body: unknown) =>
+    fetchWithAuth(url, { method: 'PUT', body: JSON.stringify(body) }),
   patch: (url: string, body: unknown) =>
     fetchWithAuth(url, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: (url: string) =>
