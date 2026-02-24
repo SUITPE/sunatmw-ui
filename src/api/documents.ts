@@ -74,6 +74,15 @@ export async function voidDocument(input: VoidDocumentInput): Promise<EmitResult
   return response.json()
 }
 
+export async function retryDocument(id: string): Promise<Document> {
+  const response = await api.post(`/api/documents/${id}/retry`, {})
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ message: 'Error al reintentar documento' }))
+    throw new Error(err.message || 'Error al reintentar documento')
+  }
+  return response.json()
+}
+
 export async function checkTicket(id: string): Promise<Document> {
   const response = await api.post(`/api/documents/${id}/check-ticket`, {})
   if (!response.ok) {

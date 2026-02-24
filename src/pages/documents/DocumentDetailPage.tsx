@@ -13,7 +13,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { VoidDocumentDialog } from '@/components/shared/VoidDocumentDialog'
 import { useDocument } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
-import { downloadDocumentXml, downloadDocumentCdr, checkTicket } from '@/api/documents'
+import { downloadDocumentXml, downloadDocumentCdr, checkTicket, retryDocument } from '@/api/documents'
 import type { DocumentInput, DocumentItem } from '@/types'
 
 const DOC_TYPE_NAMES: Record<string, string> = {
@@ -106,6 +106,8 @@ export default function DocumentDetailPage() {
 
   const [voidDialogOpen, setVoidDialogOpen] = useState(false)
   const [isCheckingTicket, setIsCheckingTicket] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+  const [retryError, setRetryError] = useState<string | null>(null)
 
   const { data: doc, isLoading, error } = useDocument(id!)
 
@@ -136,6 +138,20 @@ export default function DocumentDetailPage() {
       // silently fail — the user can retry
     } finally {
       setIsCheckingTicket(false)
+    }
+  }
+
+  const handleRetry = async () => {
+    if (!doc) return
+    setIsRetrying(true)
+    setRetryError(null)
+    try {
+      await retryDocument(doc.id)
+      queryClient.invalidateQueries({ queryKey: ['document', id] })
+    } catch (err) {
+      setRetryError(err instanceof Error ? err.message : 'Error al reintentar')
+    } finally {
+      setIsRetrying(false)
     }
   }
 
@@ -253,6 +269,19 @@ export default function DocumentDetailPage() {
                   </Button>
                 </>
               )}
+              {(doc.status === 'SIGN_ERROR' || doc.status === 'ERROR' || doc.status === 'SUNAT_ERROR') && canVoid && (
+                <Button
+                  size="sm"
+                  onClick={handleRetry}
+                  disabled={isRetrying}
+                >
+                  {isRetrying ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Reenviando...</>
+                  ) : (
+                    <><RefreshCw className="h-4 w-4 mr-2" />Reintentar</>
+                  )}
+                </Button>
+              )}
               {doc.status === 'ACCEPTED' && canVoid && (
                 <Button
                   variant="outline"
@@ -267,6 +296,19 @@ export default function DocumentDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Retry error alert */}
+      {retryError && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-red-800 text-sm">Error al reintentar</p>
+              <p className="text-sm text-red-700 mt-1">{retryError}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Emisor + Receptor */}
       {input && (
