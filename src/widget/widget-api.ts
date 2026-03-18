@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Standalone API client for the <sunat-widget> Web Component.
+// Standalone API client for the <suit-widget> Web Component.
 // Does NOT depend on auth stores — uses the API key passed via attribute.
 // ---------------------------------------------------------------------------
 

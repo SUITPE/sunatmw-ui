@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Inline CSS for the <sunat-widget> Shadow DOM.
+// Inline CSS for the <suit-widget> Shadow DOM.
 // Two themes: light and dark.
 // ---------------------------------------------------------------------------
 

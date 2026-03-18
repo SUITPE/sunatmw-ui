@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Files, PlusCircle, Users, Settings, LogOut, FileText, Receipt,
-  UserSearch, Package, Banknote, Bell,
+  LayoutDashboard, Files, PlusCircle, Users, Settings, LogOut, Receipt,
+  UserSearch, Package, Banknote, Bell, CreditCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { label: 'Cobranza', icon: Banknote, path: '/receivables' },
   { label: 'Recordatorios', icon: Bell, path: '/reminders' },
   { label: 'Usuarios', icon: Users, path: '/users', roles: ['admin'] },
+  { label: 'Facturacion', icon: CreditCard, path: '/billing', roles: ['admin'] },
   { label: 'Configuracion', icon: Settings, path: '/settings', roles: ['admin'] },
 ]
 
@@ -50,9 +51,9 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       <div className="fixed inset-0 z-50 bg-black/80 lg:hidden" onClick={onClose} />
       <div className="fixed inset-y-0 left-0 z-50 w-72 bg-background p-6 shadow-lg lg:hidden">
         <div className="flex items-center gap-2 mb-8">
-          <FileText className="h-8 w-8 text-primary" />
+          <img src="/logo-suit-icon.svg" alt="" className="h-8 w-8" />
           <div>
-            <h2 className="text-xl font-bold text-primary">sunatmw</h2>
+            <h2 className="text-xl font-bold text-primary">SUIT</h2>
             <p className="text-xs text-muted-foreground">Facturacion Electronica</p>
           </div>
         </div>

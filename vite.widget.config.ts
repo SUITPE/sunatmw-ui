@@ -12,7 +12,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/widget/index.tsx'),
-      name: 'SunatWidget',
+      name: 'SuitWidget',
       fileName: () => 'widget.js',
       formats: ['iife'],
     },

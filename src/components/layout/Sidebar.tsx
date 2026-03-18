@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Files, PlusCircle, Users, Settings,
-  PanelLeftClose, PanelLeftOpen, LogOut, FileText, Receipt,
-  UserSearch, Package, Banknote, Bell,
+  PanelLeftClose, PanelLeftOpen, LogOut, Receipt,
+  UserSearch, Package, Banknote, Bell, CreditCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
   { label: 'Cobranza', icon: Banknote, path: '/receivables' },
   { label: 'Recordatorios', icon: Bell, path: '/reminders' },
   { label: 'Usuarios', icon: Users, path: '/users', roles: ['admin'] },
+  { label: 'Facturacion', icon: CreditCard, path: '/billing', roles: ['admin'] },
   { label: 'Configuracion', icon: Settings, path: '/settings', roles: ['admin'] },
 ]
 
@@ -54,9 +55,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {!collapsed && (
         <div className="px-4 py-6">
           <div className="flex items-center gap-2">
-            <FileText className="h-8 w-8 text-primary shrink-0" />
+            <img src="/logo-suit-icon.svg" alt="" className="h-8 w-8 shrink-0" />
             <div>
-              <h2 className="text-xl font-bold text-primary">sunatmw</h2>
+              <h2 className="text-xl font-bold text-primary">SUIT</h2>
               <p className="text-xs text-muted-foreground">Facturacion Electronica</p>
             </div>
           </div>

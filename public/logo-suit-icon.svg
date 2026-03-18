@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- SUIT Icon Only - For favicon, app icon, etc. -->
+  <!-- Outer shield/document shape -->
+  <rect x="8" y="4" width="48" height="56" rx="8" fill="#1E40AF"/>
+  <!-- Inner document lines representing invoice/billing -->
+  <rect x="18" y="16" width="28" height="3" rx="1.5" fill="#93C5FD"/>
+  <rect x="18" y="24" width="22" height="3" rx="1.5" fill="#93C5FD"/>
+  <rect x="18" y="32" width="28" height="3" rx="1.5" fill="#93C5FD"/>
+  <!-- Checkmark representing validation/acceptance -->
+  <path d="M26 42 L31 47 L42 36" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
