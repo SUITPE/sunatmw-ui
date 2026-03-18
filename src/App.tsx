@@ -14,7 +14,13 @@ import ProductsPage from './pages/products/ProductsPage'
 import ReceivablesPage from './pages/receivables/ReceivablesPage'
 import RemindersPage from './pages/reminders/RemindersPage'
 import SettingsPage from './pages/settings/SettingsPage'
+import BillingPage from './pages/billing/BillingPage'
 import OnboardingWizard from './pages/onboarding/OnboardingWizard'
+import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminTenants from './pages/admin/AdminTenants'
+import AdminRevenue from './pages/admin/AdminRevenue'
+import AdminLayout from './pages/admin/AdminLayout'
 import { AppLayout } from './components/layout/AppLayout'
 import { useAuthStore } from './stores/auth.store'
 import { useOnboarding } from './hooks/useOnboarding'
@@ -70,6 +76,12 @@ function App() {
           <Route path="/receivables" element={<AuthenticatedLayout><ReceivablesPage /></AuthenticatedLayout>} />
           <Route path="/reminders" element={<AuthenticatedLayout><RemindersPage /></AuthenticatedLayout>} />
           <Route path="/settings" element={<AuthenticatedLayout><SettingsPage /></AuthenticatedLayout>} />
+          <Route path="/billing" element={<AuthenticatedLayout><BillingPage /></AuthenticatedLayout>} />
+          {/* Admin ABP Panel (Master Key auth, separate from tenant auth) */}
+          <Route path="/admin-abp" element={<AdminLoginPage />} />
+          <Route path="/admin-abp/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+          <Route path="/admin-abp/tenants" element={<AdminLayout><AdminTenants /></AdminLayout>} />
+          <Route path="/admin-abp/revenue" element={<AdminLayout><AdminRevenue /></AdminLayout>} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
