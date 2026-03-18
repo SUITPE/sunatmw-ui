@@ -31,7 +31,7 @@ const lightTokens: ThemeTokens = {
   text: '#09090b',
   textMuted: '#71717a',
   border: '#e4e4e7',
-  primary: '#2563eb',
+  primary: '#00BFD6',
   primaryText: '#ffffff',
   success: '#16a34a',
   successBg: '#dcfce7',
