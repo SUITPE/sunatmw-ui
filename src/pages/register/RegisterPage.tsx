@@ -1,29 +1,27 @@
 import { useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useAuthStore } from '@/stores/auth.store'
-import { login as apiLogin } from '@/api/auth'
+import { register } from '@/api/auth'
 
 interface FormErrors {
-  ruc?: string
   email?: string
   password?: string
+  companyName?: string
+  ruc?: string
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const verificationSuccess = (location.state as { verificationSuccess?: boolean })?.verificationSuccess
-  const storeLogin = useAuthStore((s) => s.login)
 
-  const [ruc, setRuc] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [ruc, setRuc] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -32,11 +30,6 @@ export default function LoginPage() {
 
   const validate = (): FormErrors => {
     const errors: FormErrors = {}
-    if (!ruc.trim()) {
-      errors.ruc = 'El RUC es obligatorio'
-    } else if (!/^\d{11}$/.test(ruc.trim())) {
-      errors.ruc = 'El RUC debe tener 11 digitos'
-    }
     if (!email.trim()) {
       errors.email = 'El correo electronico es obligatorio'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -46,31 +39,38 @@ export default function LoginPage() {
       errors.password = 'La contrasena es obligatoria'
     } else if (password.length < 8) {
       errors.password = 'La contrasena debe tener al menos 8 caracteres'
+    } else if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
+      errors.password = 'La contrasena debe incluir al menos 1 mayuscula y 1 numero'
+    }
+    if (!companyName.trim()) {
+      errors.companyName = 'El nombre de la empresa es obligatorio'
+    }
+    if (!ruc.trim()) {
+      errors.ruc = 'El RUC es obligatorio'
+    } else if (!/^\d{11}$/.test(ruc.trim())) {
+      errors.ruc = 'El RUC debe tener 11 digitos'
     }
     return errors
   }
 
-  const handleRucChange = (value: string) => {
-    setRuc(value.replace(/\D/g, '').slice(0, 11))
-    if (hasSubmitted) {
-      const errs = validate()
-      setFormErrors((prev) => ({ ...prev, ruc: errs.ruc }))
+  const handleFieldChange = (field: keyof FormErrors, value: string) => {
+    switch (field) {
+      case 'email':
+        setEmail(value)
+        break
+      case 'password':
+        setPassword(value)
+        break
+      case 'companyName':
+        setCompanyName(value)
+        break
+      case 'ruc':
+        setRuc(value.replace(/\D/g, '').slice(0, 11))
+        break
     }
-  }
-
-  const handleEmailChange = (value: string) => {
-    setEmail(value)
     if (hasSubmitted) {
       const errs = validate()
-      setFormErrors((prev) => ({ ...prev, email: errs.email }))
-    }
-  }
-
-  const handlePasswordChange = (value: string) => {
-    setPassword(value)
-    if (hasSubmitted) {
-      const errs = validate()
-      setFormErrors((prev) => ({ ...prev, password: errs.password }))
+      setFormErrors((prev) => ({ ...prev, [field]: errs[field] }))
     }
   }
 
@@ -85,30 +85,25 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      const response = await apiLogin({ ruc: ruc.trim(), email: email.trim(), password })
-      storeLogin(response.accessToken, response.refreshToken, response.user)
-      navigate('/dashboard', { replace: true })
+      await register({
+        email: email.trim(),
+        password,
+        companyName: companyName.trim(),
+        ruc: ruc.trim(),
+      })
+      navigate('/verify-email', { state: { email: email.trim() }, replace: true })
     } catch (err: unknown) {
       const error = err as Error & { status?: number }
-      if (error.status === 401) {
-        setApiError('Correo electronico o contrasena incorrectos. Verifica tus datos e intenta de nuevo.')
-      } else if (error.status === 403) {
-        setApiError('Tu cuenta ha sido desactivada. Contacta al administrador de tu empresa.')
-      } else if (error.status === 429) {
-        setApiError('Demasiados intentos fallidos. Espera unos minutos antes de intentar de nuevo.')
+      if (error.status === 409) {
+        setApiError('Ya existe una cuenta con este correo o RUC. Intenta iniciar sesion.')
       } else if (error.message === 'Failed to fetch') {
         setApiError('No se pudo conectar al servidor. Verifica tu conexion a internet.')
       } else {
-        setApiError('Ocurrio un error inesperado. Intenta de nuevo en unos minutos.')
+        setApiError(error.message || 'Ocurrio un error inesperado. Intenta de nuevo en unos minutos.')
       }
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleForgotPassword = () => {
-    setApiError(null)
-    alert('Contacta al administrador de tu empresa para restablecer tu contrasena.')
   }
 
   return (
@@ -134,18 +129,11 @@ export default function LoginPage() {
 
         <Card className="w-full max-w-[400px] mx-auto">
           <CardHeader className="text-center">
-            <CardTitle>Inicia sesion</CardTitle>
-            <CardDescription>Ingresa tus credenciales para acceder</CardDescription>
+            <CardTitle>Crea tu cuenta</CardTitle>
+            <CardDescription>Registra tu empresa para empezar a facturar</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} aria-label="Formulario de inicio de sesion">
-              {verificationSuccess && (
-                <Alert className="mb-4">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertDescription>Tu correo fue verificado exitosamente. Ya puedes iniciar sesion.</AlertDescription>
-                </Alert>
-              )}
-
+            <form onSubmit={handleSubmit} aria-label="Formulario de registro">
               {apiError && (
                 <Alert variant="destructive" className="mb-4">
                   <AlertCircle className="h-4 w-4" />
@@ -156,19 +144,44 @@ export default function LoginPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label
+                    htmlFor="companyName"
+                    className={formErrors.companyName ? 'text-destructive' : ''}
+                  >
+                    Nombre de la empresa
+                  </Label>
+                  <Input
+                    id="companyName"
+                    type="text"
+                    placeholder="Mi Empresa S.A.C."
+                    autoComplete="organization"
+                    value={companyName}
+                    onChange={(e) => handleFieldChange('companyName', e.target.value)}
+                    className={formErrors.companyName ? 'border-destructive focus-visible:ring-destructive' : ''}
+                    aria-invalid={formErrors.companyName ? 'true' : undefined}
+                    aria-describedby={formErrors.companyName ? 'companyName-error' : undefined}
+                  />
+                  {formErrors.companyName && (
+                    <p id="companyName-error" className="text-sm text-destructive mt-1">
+                      {formErrors.companyName}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label
                     htmlFor="ruc"
                     className={formErrors.ruc ? 'text-destructive' : ''}
                   >
-                    RUC de la empresa
+                    RUC
                   </Label>
                   <Input
                     id="ruc"
                     type="text"
                     inputMode="numeric"
                     placeholder="20123456789"
-                    autoComplete="organization"
+                    autoComplete="off"
                     value={ruc}
-                    onChange={(e) => handleRucChange(e.target.value)}
+                    onChange={(e) => handleFieldChange('ruc', e.target.value)}
                     className={formErrors.ruc ? 'border-destructive focus-visible:ring-destructive' : ''}
                     aria-invalid={formErrors.ruc ? 'true' : undefined}
                     aria-describedby={formErrors.ruc ? 'ruc-error' : undefined}
@@ -193,7 +206,7 @@ export default function LoginPage() {
                     placeholder="usuario@empresa.com"
                     autoComplete="email"
                     value={email}
-                    onChange={(e) => handleEmailChange(e.target.value)}
+                    onChange={(e) => handleFieldChange('email', e.target.value)}
                     className={formErrors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                     aria-invalid={formErrors.email ? 'true' : undefined}
                     aria-describedby={formErrors.email ? 'email-error' : undefined}
@@ -217,9 +230,9 @@ export default function LoginPage() {
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="********"
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       value={password}
-                      onChange={(e) => handlePasswordChange(e.target.value)}
+                      onChange={(e) => handleFieldChange('password', e.target.value)}
                       className={`pr-10 ${formErrors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                       aria-invalid={formErrors.password ? 'true' : undefined}
                       aria-describedby={formErrors.password ? 'password-error' : undefined}
@@ -244,35 +257,28 @@ export default function LoginPage() {
                       {formErrors.password}
                     </p>
                   )}
-                </div>
-
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    className="text-sm text-primary hover:underline cursor-pointer"
-                  >
-                    Olvide mi contrasena
-                  </button>
+                  <p className="text-xs text-muted-foreground">
+                    Minimo 8 caracteres, 1 mayuscula y 1 numero
+                  </p>
                 </div>
 
                 <Button type="submit" size="lg" className="w-full mt-2" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Iniciando sesion...
+                      Registrando...
                     </>
                   ) : (
-                    'Iniciar sesion'
+                    'Crear cuenta'
                   )}
                 </Button>
               </div>
             </form>
 
             <p className="text-sm text-center mt-4 text-muted-foreground">
-              No tienes cuenta?{' '}
-              <Link to="/register" className="text-primary hover:underline font-medium">
-                Registrate
+              Ya tienes cuenta?{' '}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Inicia sesion
               </Link>
             </p>
           </CardContent>

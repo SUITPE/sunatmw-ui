@@ -7,14 +7,67 @@ interface LoginRequest {
   ruc: string
 }
 
+interface RegisterRequest {
+  email: string
+  password: string
+  companyName: string
+  ruc: string
+}
+
+interface VerifyEmailRequest {
+  email: string
+  code: string
+}
+
+interface ResendVerificationRequest {
+  email: string
+}
+
+function handleApiError(response: Response, errorData: { message?: string } | null): never {
+  const error = new Error(errorData?.message || 'Error en la solicitud') as Error & { status: number }
+  error.status = response.status
+  throw error
+}
+
 export async function login(credentials: LoginRequest): Promise<AuthResponse> {
   const response = await api.post('/auth/login', credentials)
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null)
-    const error = new Error(errorData?.message || 'Error de autenticacion') as Error & { status: number }
-    error.status = response.status
-    throw error
+    handleApiError(response, errorData)
+  }
+
+  return response.json()
+}
+
+export async function register(data: RegisterRequest): Promise<{ message: string }> {
+  const response = await api.post('/auth/register', data)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null)
+    handleApiError(response, errorData)
+  }
+
+  return response.json()
+}
+
+export async function verifyEmail(data: VerifyEmailRequest): Promise<{ message: string }> {
+  const response = await api.post('/auth/verify-email', data)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null)
+    handleApiError(response, errorData)
+  }
+
+  return response.json()
+}
+
+export async function resendVerification(data: ResendVerificationRequest): Promise<{ message: string }> {
+  const response = await api.post('/auth/resend-verification', data)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null)
+    handleApiError(response, errorData)
   }
 
   return response.json()
