@@ -51,10 +51,10 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       <div className="fixed inset-0 z-50 bg-black/80 lg:hidden" onClick={onClose} />
       <div className="fixed inset-y-0 left-0 z-50 w-72 bg-background p-6 shadow-lg lg:hidden">
         <div className="flex items-center gap-2 mb-8">
-          <img src="/logo-suit-icon.svg" alt="" className="h-8 w-8" />
+          <img src="/favicon.svg" alt="" className="h-8 w-8" />
           <div>
-            <h2 className="text-xl font-bold text-primary">SUIT</h2>
-            <p className="text-xs text-muted-foreground">Facturacion Electronica</p>
+            <h2 className="text-xl font-bold" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, letterSpacing: '-2px' }}><span className="text-foreground">su</span><span className="text-primary">i</span><span className="text-foreground">t</span></h2>
+            <p className="text-xs text-muted-foreground">Software que se adapta a ti</p>
           </div>
         </div>
 
