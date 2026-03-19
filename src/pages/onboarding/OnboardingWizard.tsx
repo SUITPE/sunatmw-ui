@@ -82,7 +82,7 @@ function StepWelcome({ onNext, onSkipAll }: { onNext: () => void; onSkipAll: () 
           <Rocket className="h-12 w-12 text-primary" />
         </div>
       </div>
-      <h2 className="text-2xl font-bold mb-3">Bienvenido a SUNAT Middleware</h2>
+      <h2 className="text-2xl font-bold mb-3">Bienvenido a SUIT</h2>
       <p className="text-muted-foreground mb-2">
         Tu plataforma de facturacion electronica conectada directamente con SUNAT.
       </p>
