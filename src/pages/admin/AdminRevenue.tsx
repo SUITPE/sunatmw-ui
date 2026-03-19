@@ -126,9 +126,9 @@ export default function AdminRevenue() {
                 <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
                 <YAxis tickFormatter={(v: number) => `S/${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  formatter={(value: number | undefined, name: string) => {
-                    if (name === 'mrr') return [formatCurrency(value ?? 0), 'MRR']
-                    return [value ?? 0, 'Tenants']
+                  formatter={(value: any, name: any) => {
+                    if (name === 'mrr') return [formatCurrency(Number(value) || 0), 'MRR']
+                    return [Number(value) || 0, 'Tenants']
                   }}
                   labelFormatter={(label: any) => formatMonthFull(String(label))}
                 />
@@ -167,7 +167,7 @@ export default function AdminRevenue() {
                 <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
                 <YAxis />
                 <Tooltip
-                  formatter={(value: number | undefined) => [value ?? 0, 'Tenants']}
+                  formatter={(value: any) => [Number(value) || 0, 'Tenants']}
                   labelFormatter={(label: any) => formatMonthFull(String(label))}
                 />
                 <Legend />

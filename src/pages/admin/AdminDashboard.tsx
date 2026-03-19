@@ -133,7 +133,7 @@ export default function AdminDashboard() {
                   <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
                   <YAxis tickFormatter={(v: number) => `S/${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
-                    formatter={(value: number | undefined) => [formatCurrency(value ?? 0), 'MRR']}
+                    formatter={(value: any) => [formatCurrency(Number(value) || 0), 'MRR']}
                     labelFormatter={(label: any) => formatMonthLabel(String(label))}
                   />
                   <Area
