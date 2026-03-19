@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getDocuments, getDocument } from '@/api/documents'
 
 interface UseDocumentsParams {
@@ -18,12 +19,34 @@ export function useDocuments(params: UseDocumentsParams = {}) {
   })
 }
 
+const PENDING_STATUSES = ['SENT', 'READY', 'PENDING']
+
 export function useDocument(id: string) {
-  return useQuery({
+  const queryClient = useQueryClient()
+  const prevStatusRef = useRef<string | undefined>()
+
+  const query = useQuery({
     queryKey: ['document', id],
     queryFn: () => getDocument(id),
     enabled: !!id,
+    // Auto-refresh every 5s when document is in a pending status
+    refetchInterval: (query) => {
+      const status = query.state.data?.status
+      return status && PENDING_STATUSES.includes(status) ? 5000 : false
+    },
   })
+
+  // Detect status changes and invalidate documents list
+  useEffect(() => {
+    const currentStatus = query.data?.status
+    if (prevStatusRef.current && currentStatus && prevStatusRef.current !== currentStatus) {
+      // Status changed — invalidate documents list to reflect new status
+      queryClient.invalidateQueries({ queryKey: ['documents'] })
+    }
+    prevStatusRef.current = currentStatus
+  }, [query.data?.status, queryClient])
+
+  return query
 }
 
 export function useDashboardDocuments() {
