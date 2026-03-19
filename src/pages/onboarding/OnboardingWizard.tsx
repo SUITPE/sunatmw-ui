@@ -84,11 +84,10 @@ function StepWelcome({ onNext, onSkipAll }: { onNext: () => void; onSkipAll: () 
       </div>
       <h2 className="text-2xl font-bold mb-3">Bienvenido a SUIT</h2>
       <p className="text-muted-foreground mb-2">
-        Tu plataforma de facturacion electronica conectada directamente con SUNAT.
+        Software que se adapta a ti.
       </p>
       <p className="text-muted-foreground text-sm mb-8">
-        Emite facturas, boletas, notas de credito y debito de forma rapida y segura.
-        Te guiaremos en unos pasos simples para que comiences a operar.
+        Configura tu cuenta en unos pasos simples y comienza a emitir comprobantes electronicos de forma rapida y segura.
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Button size="lg" onClick={onNext}>
