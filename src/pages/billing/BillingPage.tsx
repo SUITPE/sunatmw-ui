@@ -162,7 +162,7 @@ export default function BillingPage() {
   }
 
   const currentPlan = billing?.plan?.toLowerCase() ?? 'starter'
-  const planDisplay = PLAN_DISPLAY[currentPlan] ?? PLAN_DISPLAY.starter
+  const planDisplay = (PLAN_DISPLAY[currentPlan] ?? PLAN_DISPLAY.starter)!
   const subscriptionStatus = formatSubscriptionStatus(billing?.subscription?.status)
   const isFreePlan = currentPlan === 'starter'
 

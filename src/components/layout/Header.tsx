@@ -28,8 +28,8 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
         <Button variant="ghost" size="icon" className="lg:hidden" onClick={onToggleMobileSidebar}>
           <Menu className="h-5 w-5" />
         </Button>
-        <img src="/logo-suit-icon.svg" alt="SUIT" className="h-6 w-6 lg:hidden" />
-        <span className="text-lg font-bold lg:hidden"><span className="text-foreground">su</span><span className="text-primary">IT</span></span>
+        <img src="/favicon.svg" alt="suit" className="h-6 w-6 lg:hidden" />
+        <span className="text-lg font-bold lg:hidden" style={{ fontFamily: "'Sora', sans-serif", letterSpacing: '-2px' }}><span className="text-foreground">su</span><span className="text-primary">i</span><span className="text-foreground">t</span></span>
       </div>
 
       <div className="flex items-center gap-3">

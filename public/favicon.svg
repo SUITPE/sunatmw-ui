@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- SUIT Favicon v2 - Cyan rebrand -->
-  <!-- Document shape -->
-  <rect x="4" y="2" width="24" height="28" rx="4" fill="#00BFD6"/>
-  <!-- Simplified lines -->
-  <rect x="9" y="8" width="14" height="2" rx="1" fill="#B2F5EA"/>
-  <rect x="9" y="13" width="10" height="2" rx="1" fill="#B2F5EA"/>
-  <rect x="9" y="18" width="14" height="2" rx="1" fill="#B2F5EA"/>
-  <!-- Checkmark -->
-  <path d="M12 23 L15 26 L22 19" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@800&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="512" height="512" rx="102" fill="#2563EB"/>
+  <text x="256" y="348" text-anchor="middle" 
+        font-family="'Sora', 'Helvetica Neue', Arial, sans-serif" 
+        font-size="281" font-weight="800" fill="#FFFFFF">S</text>
 </svg>

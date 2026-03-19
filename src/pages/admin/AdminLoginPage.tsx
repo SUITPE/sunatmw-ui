@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
         <div className="rounded-full bg-primary p-3 mb-3">
           <Shield className="h-8 w-8 text-primary-foreground" />
         </div>
-        <h1 className="text-xl font-bold text-primary">SUIT Admin Panel</h1>
+        <h1 className="text-xl font-bold" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, letterSpacing: '-2px' }}><span className="text-foreground">su</span><span className="text-primary">i</span><span className="text-foreground">t</span> <span className="text-foreground font-semibold" style={{ fontFamily: "'DM Sans', sans-serif", letterSpacing: 'normal' }}>Admin</span></h1>
         <p className="text-sm text-muted-foreground">Acceso restringido - ABP Team</p>
       </div>
 
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
       </Card>
 
       <p className="text-xs text-muted-foreground text-center mt-8">
-        &copy; 2026 SUIT Admin - ABP Team
+        &copy; 2026 suit Admin — ABP Team
       </p>
     </div>
   )

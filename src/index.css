@@ -2,25 +2,25 @@
 
 @theme inline {
   --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(20 3% 17%);           /* Charcoal #2E2C2B */
+  --color-foreground: hsl(228 75% 8%);           /* Deep Navy #0A0F1C */
   --color-muted: hsl(210 40% 96.1%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  --color-muted-foreground: hsl(240 4% 46%);     /* #71717A */
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(20 3% 17%);
+  --color-popover-foreground: hsl(228 75% 8%);
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(20 3% 17%);
+  --color-card-foreground: hsl(228 75% 8%);
   --color-border: hsl(214.3 31.8% 91.4%);
   --color-input: hsl(214.3 31.8% 91.4%);
-  --color-primary: hsl(187 100% 42%);           /* Cyan #00BFD6 */
+  --color-primary: hsl(224 76% 53%);             /* Electric Blue #2563EB */
   --color-primary-foreground: hsl(0 0% 100%);
-  --color-primary-text: hsl(192 80% 30%);       /* Cyan dark #0E7490 for text on white */
+  --color-primary-text: hsl(224 76% 53%);        /* Electric Blue for text links */
   --color-secondary: hsl(210 40% 96.1%);
-  --color-secondary-foreground: hsl(20 3% 17%);
+  --color-secondary-foreground: hsl(228 75% 8%);
   --color-accent: hsl(210 40% 96.1%);
-  --color-accent-foreground: hsl(20 3% 17%);
+  --color-accent-foreground: hsl(228 75% 8%);
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(0 0% 100%);
-  --color-ring: hsl(187 100% 42%);              /* Cyan focus ring */
+  --color-ring: hsl(224 76% 53%);                /* Electric Blue focus ring */
   --radius: 0.5rem;
 }
 
@@ -31,6 +31,6 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: 'Urbanist', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   }
 }
