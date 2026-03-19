@@ -167,8 +167,8 @@ export default function AdminRevenue() {
                 <XAxis dataKey="month" tickFormatter={formatMonthLabel} />
                 <YAxis />
                 <Tooltip
-                  formatter={(value: number) => [value, 'Tenants']}
-                  labelFormatter={(label: string) => formatMonthFull(label)}
+                  formatter={(value: number | undefined) => [value ?? 0, 'Tenants']}
+                  labelFormatter={(label: any) => formatMonthFull(String(label))}
                 />
                 <Legend />
                 <Bar dataKey="tenants" name="Tenants Activos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
