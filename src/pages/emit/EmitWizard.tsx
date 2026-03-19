@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { CheckCircle2, XCircle, AlertTriangle, Plus, Trash2, Loader2, FileText, RotateCcw, Search } from 'lucide-react'
+import { CheckCircle2, XCircle, AlertTriangle, Plus, Trash2, Loader2, FileText, RotateCcw, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -70,10 +70,9 @@ interface WizardState {
 }
 
 const STEPS = [
-  { number: 1, label: 'Datos Generales' },
-  { number: 2, label: 'Cliente' },
-  { number: 3, label: 'Items' },
-  { number: 4, label: 'Confirmar' },
+  { number: 1, label: 'A quien' },
+  { number: 2, label: 'Que' },
+  { number: 3, label: 'Confirmar' },
 ] as const
 
 const IGV_TYPE_LABELS: Record<string, string> = {
@@ -301,6 +300,7 @@ export default function EmitWizard({ config }: EmitWizardProps) {
   const [form, setForm] = useState<WizardState>(() => createInitialState(config))
   const [stepError, setStepError] = useState<string | null>(null)
   const [emitResult, setEmitResult] = useState<EmitResult | null>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   // Mutation
   const mutation = useMutation({
@@ -385,16 +385,19 @@ export default function EmitWizard({ config }: EmitWizardProps) {
 
   function goNext() {
     let error: string | null = null
-    if (step === 1) error = validateStep1(form)
-    else if (step === 2) error = validateStep2(form)
-    else if (step === 3) error = validateStep3(form)
+    if (step === 1) {
+      // Step 1 now validates both general data + customer
+      error = validateStep1(form) || validateStep2(form)
+    } else if (step === 2) {
+      error = validateStep3(form)
+    }
 
     if (error) {
       setStepError(error)
       return
     }
     setStepError(null)
-    setStep((s) => Math.min(s + 1, 4))
+    setStep((s) => Math.min(s + 1, 3))
   }
 
   function goBack() {
@@ -493,88 +496,22 @@ export default function EmitWizard({ config }: EmitWizardProps) {
   }
 
   // ---------------------------------------------------------------------------
-  // Render: Step 1 - Datos Generales
+  // Render: Step 1 - A quien (Cliente + Opciones avanzadas colapsables)
   // ---------------------------------------------------------------------------
 
   function renderStep1() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Datos Generales</CardTitle>
+          <CardTitle>A quien le facturas?</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="series">Serie *</Label>
-              <Input
-                id="series"
-                value={form.series}
-                onChange={(e) => updateField('series', e.target.value.toUpperCase())}
-                placeholder={config.defaultSeries}
-                maxLength={4}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="correlative">Correlativo *</Label>
-              <Input
-                id="correlative"
-                type="number"
-                min={1}
-                value={form.correlative}
-                onChange={(e) => updateField('correlative', parseInt(e.target.value) || 0)}
-              />
-            </div>
+          {/* Smart defaults info */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
+            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+            <span>Serie <strong>{form.series}</strong>, fecha <strong>{form.issueDate}</strong>, moneda <strong>{form.currencyCode}</strong> (auto-configurados)</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="issueDate">Fecha de Emision *</Label>
-              <Input
-                id="issueDate"
-                type="date"
-                value={form.issueDate}
-                onChange={(e) => updateField('issueDate', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dueDate">Fecha de Vencimiento</Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={form.dueDate}
-                onChange={(e) => updateField('dueDate', e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="currencyCode">Moneda *</Label>
-            <select
-              id="currencyCode"
-              className={selectClassName}
-              value={form.currencyCode}
-              onChange={(e) => updateField('currencyCode', e.target.value)}
-            >
-              <option value="PEN">PEN - Soles</option>
-              <option value="USD">USD - Dolares</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // ---------------------------------------------------------------------------
-  // Render: Step 2 - Cliente
-  // ---------------------------------------------------------------------------
-
-  function renderStep2() {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Datos del Cliente</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
           {/* Client autocomplete search */}
           <ClientAutocomplete onSelectClient={handleSelectClient} />
 
@@ -586,7 +523,7 @@ export default function EmitWizard({ config }: EmitWizardProps) {
             </span>
           </div>
 
-          {/* Manual entry fields (unchanged) */}
+          {/* Manual entry fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="customerDocType">Tipo de Documento *</Label>
@@ -643,6 +580,75 @@ export default function EmitWizard({ config }: EmitWizardProps) {
               placeholder="Av. Principal 123, Lima"
             />
           </div>
+
+          {/* Collapsible advanced options */}
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            Opciones avanzadas
+          </button>
+
+          {showAdvanced && (
+            <div className="space-y-4 pt-2 border-t border-border">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="series">Serie</Label>
+                  <Input
+                    id="series"
+                    value={form.series}
+                    onChange={(e) => updateField('series', e.target.value.toUpperCase())}
+                    placeholder={config.defaultSeries}
+                    maxLength={4}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="correlative">Correlativo</Label>
+                  <Input
+                    id="correlative"
+                    type="number"
+                    min={1}
+                    value={form.correlative}
+                    onChange={(e) => updateField('correlative', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="issueDate">Fecha de Emision</Label>
+                  <Input
+                    id="issueDate"
+                    type="date"
+                    value={form.issueDate}
+                    onChange={(e) => updateField('issueDate', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dueDate">Fecha de Vencimiento</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={form.dueDate}
+                    onChange={(e) => updateField('dueDate', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currencyCode">Moneda</Label>
+                <select
+                  id="currencyCode"
+                  className={selectClassName}
+                  value={form.currencyCode}
+                  onChange={(e) => updateField('currencyCode', e.target.value)}
+                >
+                  <option value="PEN">PEN - Soles</option>
+                  <option value="USD">USD - Dolares</option>
+                </select>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -1269,12 +1275,11 @@ export default function EmitWizard({ config }: EmitWizardProps) {
       )}
 
       {step === 1 && renderStep1()}
-      {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
-      {step === 4 && renderStep4()}
+      {step === 2 && renderStep3()}
+      {step === 3 && renderStep4()}
 
-      {/* Navigation buttons (hidden on step 4 when result is shown) */}
-      {!(step === 4 && emitResult) && (
+      {/* Navigation buttons (hidden on step 3 when result is shown) */}
+      {!(step === 3 && emitResult) && (
         <div className="flex justify-between mt-6">
           <Button
             variant="outline"
@@ -1283,7 +1288,7 @@ export default function EmitWizard({ config }: EmitWizardProps) {
           >
             Anterior
           </Button>
-          {step < 4 && (
+          {step < 3 && (
             <Button onClick={goNext}>
               Siguiente
             </Button>
