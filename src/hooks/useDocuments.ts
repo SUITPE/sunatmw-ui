@@ -23,7 +23,7 @@ const PENDING_STATUSES = ['SENT', 'READY', 'PENDING']
 
 export function useDocument(id: string) {
   const queryClient = useQueryClient()
-  const prevStatusRef = useRef<string | undefined>()
+  const prevStatusRef = useRef<string | undefined>(undefined)
 
   const query = useQuery({
     queryKey: ['document', id],

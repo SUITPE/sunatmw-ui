@@ -109,7 +109,7 @@ export default function DocumentDetailPage() {
   const [isRetrying, setIsRetrying] = useState(false)
   const [retryError, setRetryError] = useState<string | null>(null)
   const [statusToast, setStatusToast] = useState<string | null>(null)
-  const prevStatusRef = useRef<string | undefined>()
+  const prevStatusRef = useRef<string | undefined>(undefined)
 
   const { data: doc, isLoading, error } = useDocument(id!)
 
