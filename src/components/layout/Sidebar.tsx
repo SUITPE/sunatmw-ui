@@ -57,7 +57,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <div className="flex items-center gap-2">
             <img src="/logo-suit-icon.svg" alt="" className="h-8 w-8 shrink-0" />
             <div>
-              <h2 className="text-xl font-bold text-primary">SUIT</h2>
+              <h2 className="text-xl font-bold"><span className="text-foreground">su</span><span className="text-primary">IT</span></h2>
               <p className="text-xs text-muted-foreground">Facturacion Electronica</p>
             </div>
           </div>

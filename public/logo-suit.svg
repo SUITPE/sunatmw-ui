@@ -1,24 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
-  <!-- SUIT Logo - Full (Icon + Text) -->
-  <!-- Icon: Abstract document/shield shape representing trust + billing -->
+  <!-- SUIT Logo v2 - Full (Icon + Text) - Cyan rebrand -->
+  <!-- Icon -->
   <g id="icon">
-    <!-- Outer shield/document shape -->
-    <rect x="4" y="4" width="48" height="56" rx="8" fill="#1E40AF"/>
-    <!-- Inner document lines representing invoice/billing -->
-    <rect x="14" y="16" width="28" height="3" rx="1.5" fill="#93C5FD"/>
-    <rect x="14" y="24" width="22" height="3" rx="1.5" fill="#93C5FD"/>
-    <rect x="14" y="32" width="28" height="3" rx="1.5" fill="#93C5FD"/>
-    <!-- Checkmark representing validation/acceptance -->
-    <path d="M22 42 L27 47 L38 36" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="4" y="4" width="48" height="56" rx="8" fill="#00BFD6"/>
+    <rect x="14" y="16" width="28" height="3" rx="1.5" fill="#B2F5EA"/>
+    <rect x="14" y="24" width="22" height="3" rx="1.5" fill="#B2F5EA"/>
+    <rect x="14" y="32" width="28" height="3" rx="1.5" fill="#B2F5EA"/>
+    <path d="M22 42 L27 47 L38 36" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <!-- Text: SUIT -->
+  <!-- Text: suIT -->
   <g id="text">
-    <text x="72" y="44" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.02em" fill="#0F172A">
-      <tspan fill="#1E40AF">S</tspan><tspan fill="#0F172A">UIT</tspan>
+    <text x="72" y="44" font-family="Urbanist, system-ui, -apple-system, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.02em" fill="#2E2C2B">
+      <tspan fill="#2E2C2B">su</tspan><tspan fill="#00BFD6">IT</tspan>
     </text>
   </g>
   <!-- Tagline -->
-  <text x="72" y="58" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="10" font-weight="400" letter-spacing="0.08em" fill="#64748B">
+  <text x="72" y="58" font-family="Urbanist, system-ui, -apple-system, sans-serif" font-size="10" font-weight="400" letter-spacing="0.08em" fill="#64748B">
     SOLUCIONES DE NEGOCIO
   </text>
 </svg>

@@ -116,7 +116,7 @@ export default function LoginPage() {
       {/* Brand Panel (desktop only) */}
       <div className="hidden lg:flex lg:flex-col lg:items-center lg:justify-center bg-primary text-primary-foreground p-16">
         <img src="/logo-suit-icon.svg" alt="" className="h-16 w-16 mb-4 brightness-0 invert" />
-        <h1 className="text-3xl font-bold mt-4">SUIT Portal</h1>
+        <h1 className="text-3xl font-bold mt-4"><span>su</span><span className="opacity-90">IT</span> Portal</h1>
         <p className="text-lg opacity-80 mt-2">Facturacion Electronica</p>
         <p className="text-base opacity-70 mt-8 italic max-w-xs text-center">
           Emite tus comprobantes de forma simple y segura
@@ -128,7 +128,7 @@ export default function LoginPage() {
         {/* Mobile logo */}
         <div className="lg:hidden flex flex-col items-center mb-8">
           <img src="/logo-suit-icon.svg" alt="" className="h-12 w-12" />
-          <h1 className="text-xl font-bold text-primary mt-2">SUIT Portal</h1>
+          <h1 className="text-xl font-bold mt-2"><span className="text-foreground">su</span><span className="text-primary">IT</span> Portal</h1>
           <p className="text-sm text-muted-foreground">Facturacion Electronica</p>
         </div>
 
@@ -279,7 +279,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-xs text-muted-foreground text-center mt-8">
-          &copy; 2026 SUIT - Powered by SUIT
+          &copy; 2026 suIT - Soluciones de Negocio
         </p>
       </div>
     </div>

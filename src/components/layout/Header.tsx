@@ -29,7 +29,7 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         <img src="/logo-suit-icon.svg" alt="SUIT" className="h-6 w-6 lg:hidden" />
-        <span className="text-lg font-bold text-primary lg:hidden">SUIT</span>
+        <span className="text-lg font-bold lg:hidden"><span className="text-foreground">su</span><span className="text-primary">IT</span></span>
       </div>
 
       <div className="flex items-center gap-3">
