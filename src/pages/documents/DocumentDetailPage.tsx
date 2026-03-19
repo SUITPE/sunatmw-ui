@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -108,8 +108,26 @@ export default function DocumentDetailPage() {
   const [isCheckingTicket, setIsCheckingTicket] = useState(false)
   const [isRetrying, setIsRetrying] = useState(false)
   const [retryError, setRetryError] = useState<string | null>(null)
+  const [statusToast, setStatusToast] = useState<string | null>(null)
+  const prevStatusRef = useRef<string | undefined>()
 
   const { data: doc, isLoading, error } = useDocument(id!)
+
+  // Toast notification when status changes (auto-refresh detected a change)
+  useEffect(() => {
+    const currentStatus = doc?.status
+    if (prevStatusRef.current && currentStatus && prevStatusRef.current !== currentStatus) {
+      const statusLabels: Record<string, string> = {
+        ACCEPTED: 'Documento aceptado por SUNAT',
+        REJECTED: 'Documento rechazado por SUNAT',
+        ERROR: 'Error procesando documento',
+        SENT: 'Documento enviado a SUNAT',
+      }
+      setStatusToast(statusLabels[currentStatus] || `Estado actualizado: ${currentStatus}`)
+      setTimeout(() => setStatusToast(null), 5000)
+    }
+    prevStatusRef.current = currentStatus
+  }, [doc?.status])
 
   const input = doc?.jsonInput as DocumentInput | null
   const items = input?.items ?? []
@@ -213,8 +231,19 @@ export default function DocumentDetailPage() {
 
   const borderColor = STATUS_BORDER_COLORS[doc.status] ?? 'border-t-gray-500'
 
+  const isPending = ['SENT', 'READY', 'PENDING'].includes(doc.status)
+
   return (
     <div>
+      {/* Status change toast */}
+      {statusToast && (
+        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2 bg-card border rounded-lg shadow-lg px-4 py-3 flex items-center gap-2 max-w-sm">
+          <RefreshCw className="h-4 w-4 text-primary shrink-0" />
+          <span className="text-sm">{statusToast}</span>
+          <button onClick={() => setStatusToast(null)} className="text-muted-foreground hover:text-foreground ml-2">&times;</button>
+        </div>
+      )}
+
       {/* Breadcrumbs */}
       <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
         <button
@@ -226,6 +255,14 @@ export default function DocumentDetailPage() {
         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
         <span className="text-foreground font-medium">{doc.documentId}</span>
       </div>
+
+      {/* Auto-refresh indicator */}
+      {isPending && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-4">
+          <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
+          <span>Esperando respuesta de SUNAT — actualizando automaticamente...</span>
+        </div>
+      )}
 
       {/* Status Header Card */}
       <Card className={`border-t-4 ${borderColor}`}>

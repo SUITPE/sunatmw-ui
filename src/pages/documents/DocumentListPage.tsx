@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, PlusCircle, Files } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -44,7 +44,7 @@ export default function DocumentListPage() {
   const [search, setSearch] = useState('')
   const limit = 20
 
-  const { data, isLoading } = useDocuments({
+  const { data, isLoading, refetch } = useDocuments({
     page,
     limit,
     type: typeFilter || undefined,
@@ -53,6 +53,18 @@ export default function DocumentListPage() {
 
   const documents = data?.data ?? []
   const pagination = data?.pagination
+
+  // Auto-refresh when there are pending documents
+  const hasPendingDocs = useMemo(
+    () => documents.some((d) => ['SENT', 'READY', 'PENDING'].includes(d.status)),
+    [documents],
+  )
+
+  useEffect(() => {
+    if (!hasPendingDocs) return
+    const interval = setInterval(() => refetch(), 10000) // Refresh every 10s
+    return () => clearInterval(interval)
+  }, [hasPendingDocs, refetch])
 
   const filteredDocs = useMemo(() => {
     if (!search.trim()) return documents
