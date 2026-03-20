@@ -15,7 +15,7 @@ export default function EmitReceiptPage() {
           { value: '6', label: 'RUC' },
         ],
         emitFn: emitReceipt,
-        emitButtonLabel: 'Emitir a SUNAT',
+        emitButtonLabel: 'Emitir Boleta',
         emitAnotherLabel: 'Emitir otra boleta',
       }}
     />

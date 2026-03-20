@@ -15,7 +15,7 @@ export default function EmitInvoicePage() {
           { value: '1', label: 'DNI' },
         ],
         emitFn: emitInvoice,
-        emitButtonLabel: 'Emitir a SUNAT',
+        emitButtonLabel: 'Emitir Factura',
         emitAnotherLabel: 'Emitir otra factura',
       }}
     />
