@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  ChevronRight, Code, FileCheck, Ban, FileX, Download,
+  ChevronRight, Code, FileCheck, Ban, FileX, Download, Mail,
   AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2, RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { VoidDocumentDialog } from '@/components/shared/VoidDocumentDialog'
 import { useDocument } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
-import { downloadDocumentXml, downloadDocumentCdr, downloadDocumentPdf, checkTicket, retryDocument } from '@/api/documents'
+import { downloadDocumentXml, downloadDocumentCdr, downloadDocumentPdf, sendDocumentEmail, checkTicket, retryDocument } from '@/api/documents'
 import type { DocumentInput, DocumentItem } from '@/types'
 
 const DOC_TYPE_NAMES: Record<string, string> = {
@@ -150,6 +150,20 @@ export default function DocumentDetailPage() {
     if (!doc) return
     const blob = await downloadDocumentPdf(doc.id)
     triggerDownload(blob, `${doc.documentId}.pdf`)
+  }
+
+  const handleSendEmail = async () => {
+    if (!doc) return
+    const email = window.prompt('Ingresa el correo del destinatario:')
+    if (!email) return
+    try {
+      const result = await sendDocumentEmail(doc.id, email)
+      setStatusToast(result.message)
+      setTimeout(() => setStatusToast(null), 5000)
+    } catch (err: any) {
+      setStatusToast(err.message || 'Error al enviar correo')
+      setTimeout(() => setStatusToast(null), 5000)
+    }
   }
 
   const handleCheckTicket = async () => {
@@ -289,6 +303,9 @@ export default function DocumentDetailPage() {
               </Button>
               <Button variant="outline" size="sm" onClick={handleDownloadXml}>
                 <Code className="h-4 w-4 mr-2" />Descargar XML
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSendEmail}>
+                <Mail className="h-4 w-4 mr-2" />Enviar por correo
               </Button>
               {doc.status === 'ACCEPTED' && (
                 <Button variant="outline" size="sm" onClick={handleDownloadCdr}>
