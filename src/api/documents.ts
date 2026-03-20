@@ -65,6 +65,15 @@ export async function downloadDocumentCdr(id: string): Promise<Blob> {
   return response.blob()
 }
 
+export async function sendDocumentEmail(id: string, email: string): Promise<{ success: boolean; message: string }> {
+  const response = await api.post(`/api/documents/${id}/send-email`, { email })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ message: 'Error al enviar correo' }))
+    throw new Error(err.message || 'Error al enviar correo')
+  }
+  return response.json()
+}
+
 export async function downloadDocumentPdf(id: string): Promise<Blob> {
   const response = await api.get(`/api/documents/${id}/pdf`)
   if (!response.ok) throw new Error('Failed to download PDF')
