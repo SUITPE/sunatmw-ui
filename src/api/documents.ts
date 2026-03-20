@@ -65,6 +65,12 @@ export async function downloadDocumentCdr(id: string): Promise<Blob> {
   return response.blob()
 }
 
+export async function downloadDocumentPdf(id: string): Promise<Blob> {
+  const response = await api.get(`/api/documents/${id}/pdf`)
+  if (!response.ok) throw new Error('Failed to download PDF')
+  return response.blob()
+}
+
 export async function voidDocument(input: VoidDocumentInput): Promise<EmitResult> {
   const response = await api.post('/api/voided-documents', input)
   if (!response.ok) {
