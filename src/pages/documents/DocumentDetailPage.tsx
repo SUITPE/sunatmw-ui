@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  ChevronRight, Code, FileCheck, Ban, FileX,
+  ChevronRight, Code, FileCheck, Ban, FileX, Download,
   AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2, RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { VoidDocumentDialog } from '@/components/shared/VoidDocumentDialog'
 import { useDocument } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
-import { downloadDocumentXml, downloadDocumentCdr, checkTicket, retryDocument } from '@/api/documents'
+import { downloadDocumentXml, downloadDocumentCdr, downloadDocumentPdf, checkTicket, retryDocument } from '@/api/documents'
 import type { DocumentInput, DocumentItem } from '@/types'
 
 const DOC_TYPE_NAMES: Record<string, string> = {
@@ -144,6 +144,12 @@ export default function DocumentDetailPage() {
     if (!doc) return
     const blob = await downloadDocumentCdr(doc.id)
     triggerDownload(blob, `R-${doc.documentId}.xml`)
+  }
+
+  const handleDownloadPdf = async () => {
+    if (!doc) return
+    const blob = await downloadDocumentPdf(doc.id)
+    triggerDownload(blob, `${doc.documentId}.pdf`)
   }
 
   const handleCheckTicket = async () => {
@@ -278,6 +284,9 @@ export default function DocumentDetailPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
+                <Download className="h-4 w-4 mr-2" />Descargar PDF
+              </Button>
               <Button variant="outline" size="sm" onClick={handleDownloadXml}>
                 <Code className="h-4 w-4 mr-2" />Descargar XML
               </Button>
