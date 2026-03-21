@@ -73,6 +73,38 @@ export async function resendVerification(data: ResendVerificationRequest): Promi
   return response.json()
 }
 
+interface ForgotPasswordRequest {
+  email: string
+  ruc: string
+}
+
+interface ResetPasswordRequest {
+  token: string
+  newPassword: string
+}
+
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
+  const response = await api.post('/auth/forgot-password', data)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null)
+    handleApiError(response, errorData)
+  }
+
+  return response.json()
+}
+
+export async function resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+  const response = await api.post('/auth/reset-password', data)
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null)
+    handleApiError(response, errorData)
+  }
+
+  return response.json()
+}
+
 export async function refreshToken(token: string): Promise<{ accessToken: string }> {
   const response = await api.post('/auth/refresh', { refreshToken: token })
 

@@ -107,8 +107,7 @@ export default function LoginPage() {
   }
 
   const handleForgotPassword = () => {
-    setApiError(null)
-    alert('Contacta al administrador de tu empresa para restablecer tu contrasena.')
+    navigate('/forgot-password')
   }
 
   return (
