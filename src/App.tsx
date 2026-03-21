@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LoginPage from './pages/login/LoginPage'
+import ForgotPasswordPage from './pages/login/ForgotPasswordPage'
+import ResetPasswordPage from './pages/login/ResetPasswordPage'
 import RegisterPage from './pages/register/RegisterPage'
 import VerifyEmailPage from './pages/register/VerifyEmailPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
@@ -64,6 +66,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
