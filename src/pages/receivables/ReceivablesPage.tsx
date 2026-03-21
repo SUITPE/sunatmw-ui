@@ -297,12 +297,19 @@ export default function ReceivablesPage() {
       ) : receivables.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24">
           <Banknote className="h-16 w-16 text-muted-foreground/30 mb-4" />
-          <h2 className="text-lg font-medium">No hay cuentas por cobrar</h2>
+          <h2 className="text-lg font-medium">
+            {statusFilter || fromDate || toDate
+              ? 'No se encontraron cuentas por cobrar'
+              : 'No hay cuentas por cobrar'}
+          </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {statusFilter || fromDate || toDate
-              ? 'No se encontraron resultados con los filtros aplicados'
+              ? 'Intenta modificar los filtros de busqueda'
               : 'Las cuentas por cobrar se crean automaticamente al emitir facturas'}
           </p>
+          {(statusFilter || fromDate || toDate) && (
+            <Button variant="outline" className="mt-4" onClick={() => { setStatusFilter(''); setFromDate(''); setToDate('') }}>Limpiar filtros</Button>
+          )}
         </div>
       ) : (
         <>

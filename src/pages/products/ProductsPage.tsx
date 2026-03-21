@@ -218,13 +218,19 @@ export default function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24">
           <Package className="h-16 w-16 text-muted-foreground/30 mb-4" />
-          <h2 className="text-lg font-medium">No hay productos</h2>
+          <h2 className="text-lg font-medium">
+            {debouncedSearch || filterCategory || filterIgvType
+              ? 'No se encontraron productos'
+              : 'No hay productos'}
+          </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch || filterCategory || filterIgvType
-              ? 'No se encontraron resultados'
+              ? 'Intenta modificar los filtros de busqueda'
               : 'Crea el primer producto de tu empresa'}
           </p>
-          {!debouncedSearch && !filterCategory && !filterIgvType && (
+          {debouncedSearch || filterCategory || filterIgvType ? (
+            <Button variant="outline" className="mt-4" onClick={() => { setSearch(''); setFilterCategory(''); setFilterIgvType('') }}>Limpiar filtros</Button>
+          ) : (
             <Button className="mt-4" onClick={() => { setShowCreateModal(true); setFormError(null) }}>
               <Plus className="h-4 w-4 mr-2" />Crear Producto
             </Button>
