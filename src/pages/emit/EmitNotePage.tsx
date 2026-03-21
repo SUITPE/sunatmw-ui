@@ -19,6 +19,7 @@ import {
   formatCurrency,
   IGV_TYPES,
 } from '@/lib/calculations'
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1193,6 +1194,11 @@ export default function EmitNotePage({ config }: { config: EmitNotePageConfig })
 
   return (
     <div>
+      <Breadcrumbs items={[
+        { label: 'Documentos', href: '/documents' },
+        { label: config.title },
+      ]} />
+
       <div className="mb-6">
         <h1 className="text-3xl font-bold">{config.title}</h1>
         <p className="text-muted-foreground text-sm mt-1">
