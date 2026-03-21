@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  ChevronRight, Code, FileCheck, Ban, FileX, Download, Mail,
+  Code, FileCheck, Ban, FileX, Download, Mail,
   AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2, RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { VoidDocumentDialog } from '@/components/shared/VoidDocumentDialog'
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs'
 import { useDocument } from '@/hooks/useDocuments'
 import { useAuthStore } from '@/stores/auth.store'
 import { downloadDocumentXml, downloadDocumentCdr, downloadDocumentPdf, sendDocumentEmail, checkTicket, retryDocument } from '@/api/documents'
@@ -264,17 +265,10 @@ export default function DocumentDetailPage() {
         </div>
       )}
 
-      {/* Breadcrumbs */}
-      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
-        <button
-          onClick={() => navigate('/documents')}
-          className="text-primary hover:underline"
-        >
-          Documentos
-        </button>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-        <span className="text-foreground font-medium">{doc.documentId}</span>
-      </div>
+      <Breadcrumbs items={[
+        { label: 'Documentos', href: '/documents' },
+        { label: doc.documentId },
+      ]} />
 
       {/* Auto-refresh indicator */}
       {isPending && (
