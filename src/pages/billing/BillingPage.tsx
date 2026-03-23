@@ -3,8 +3,9 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
-  CheckCircle, Crown, Calendar,
+  Crown, Calendar,
 } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -59,26 +60,22 @@ function formatDate(dateStr: string | null | undefined): string {
 
 export default function BillingPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [successToast, setSuccessToast] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
+  const { success: showSuccess, error: showError } = useToast()
 
   // Detect checkout success/cancel from Stripe redirect
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
-      setSuccessToast(true)
+      showSuccess('Tu suscripcion se ha actualizado correctamente. Los cambios pueden tardar unos segundos en reflejarse.')
       setSearchParams({}, { replace: true })
-      const timer = setTimeout(() => setSuccessToast(false), 6000)
-      return () => clearTimeout(timer)
     }
     if (searchParams.get('canceled') === 'true') {
-      setErrorMessage('El pago fue cancelado. Puedes intentar de nuevo cuando quieras.')
+      showError('El pago fue cancelado. Puedes intentar de nuevo cuando quieras.')
       setSearchParams({}, { replace: true })
-      const timer = setTimeout(() => setErrorMessage(null), 6000)
-      return () => clearTimeout(timer)
     }
-  }, [searchParams, setSearchParams])
+  }, [searchParams, setSearchParams, showSuccess, showError])
 
   const {
     data: billing,
@@ -176,17 +173,6 @@ export default function BillingPage() {
           </p>
         </div>
       </div>
-
-      {/* Success Toast */}
-      {successToast && (
-        <Alert className="mb-6 border-green-200 bg-green-50">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
-            Tu suscripcion se ha actualizado correctamente. Los cambios pueden tardar unos
-            segundos en reflejarse.
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Error message */}
       {errorMessage && (

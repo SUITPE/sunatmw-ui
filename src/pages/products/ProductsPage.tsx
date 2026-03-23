@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Package, Plus, Pencil, Trash2, Search, X, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Package, Plus, Pencil, Trash2, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -50,30 +51,13 @@ function formatPrice(price: string): string {
   return `S/ ${num.toFixed(2)}`
 }
 
-function Toast({ message, onClose }: { message: string; onClose: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000)
-    return () => clearTimeout(timer)
-  }, [onClose])
-
-  return (
-    <div className="fixed top-4 right-4 z-[60] flex items-center gap-2 rounded-lg border bg-background px-4 py-3 shadow-lg animate-in fade-in slide-in-from-top-2">
-      <CheckCircle className="h-4 w-4 text-green-600" />
-      <span className="text-sm font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 text-muted-foreground hover:text-foreground">
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  )
-}
-
 export default function ProductsPage() {
   const queryClient = useQueryClient()
+  const { success: showSuccess } = useToast()
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deactivatingProduct, setDeactivatingProduct] = useState<Product | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
@@ -118,7 +102,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setShowCreateModal(false)
-      setToast('Producto creado exitosamente')
+      showSuccess('Producto creado exitosamente')
       setFormError(null)
     },
     onError: (err: Error) => {
@@ -131,7 +115,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setEditingProduct(null)
-      setToast('Producto actualizado exitosamente')
+      showSuccess('Producto actualizado exitosamente')
       setFormError(null)
     },
     onError: (err: Error) => {
@@ -144,7 +128,7 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       setDeactivatingProduct(null)
-      setToast('Producto desactivado exitosamente')
+      showSuccess('Producto desactivado exitosamente')
     },
     onError: (err: Error) => {
       setFormError(err.message)
@@ -163,8 +147,6 @@ export default function ProductsPage() {
 
   return (
     <div>
-      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
         <div>

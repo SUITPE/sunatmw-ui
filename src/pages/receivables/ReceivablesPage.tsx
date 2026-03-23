@@ -4,6 +4,7 @@ import {
   Banknote, DollarSign, AlertTriangle, Clock, CheckCircle, X,
   ChevronLeft, ChevronRight, CreditCard,
 } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -68,28 +69,11 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge className={styles[status] || styles.pending}>{label}</Badge>
 }
 
-function Toast({ message, onClose }: { message: string; onClose: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000)
-    return () => clearTimeout(timer)
-  }, [onClose])
-
-  return (
-    <div className="fixed top-4 right-4 z-[60] flex items-center gap-2 rounded-lg border bg-background px-4 py-3 shadow-lg animate-in fade-in slide-in-from-top-2">
-      <CheckCircle className="h-4 w-4 text-green-600" />
-      <span className="text-sm font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 text-muted-foreground hover:text-foreground">
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  )
-}
-
 export default function ReceivablesPage() {
   const queryClient = useQueryClient()
+  const { success: showSuccess } = useToast()
 
   const [payingReceivable, setPayingReceivable] = useState<Receivable | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
 
   // Filters
@@ -146,7 +130,7 @@ export default function ReceivablesPage() {
       queryClient.invalidateQueries({ queryKey: ['receivables-summary'] })
       queryClient.invalidateQueries({ queryKey: ['receivables-aging'] })
       setPayingReceivable(null)
-      setToast('Pago registrado exitosamente')
+      showSuccess('Pago registrado exitosamente')
       setFormError(null)
     },
     onError: (err: Error) => {
@@ -171,8 +155,6 @@ export default function ReceivablesPage() {
 
   return (
     <div>
-      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
         <div>

@@ -5,6 +5,7 @@ import {
   Code, FileCheck, Ban, FileX, Download, Mail,
   AlertTriangle, Loader2, ArrowLeft, FileMinus2, FilePlus2, RefreshCw,
 } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -109,8 +110,8 @@ export default function DocumentDetailPage() {
   const [isCheckingTicket, setIsCheckingTicket] = useState(false)
   const [isRetrying, setIsRetrying] = useState(false)
   const [retryError, setRetryError] = useState<string | null>(null)
-  const [statusToast, setStatusToast] = useState<string | null>(null)
   const prevStatusRef = useRef<string | undefined>(undefined)
+  const { info: showInfo, error: showError } = useToast()
 
   const { data: doc, isLoading, error } = useDocument(id!)
 
@@ -124,11 +125,10 @@ export default function DocumentDetailPage() {
         ERROR: 'Error procesando documento',
         SENT: 'Documento enviado a SUNAT',
       }
-      setStatusToast(statusLabels[currentStatus] || `Estado actualizado: ${currentStatus}`)
-      setTimeout(() => setStatusToast(null), 5000)
+      showInfo(statusLabels[currentStatus] || `Estado actualizado: ${currentStatus}`)
     }
     prevStatusRef.current = currentStatus
-  }, [doc?.status])
+  }, [doc?.status, showInfo])
 
   const input = doc?.jsonInput as DocumentInput | null
   const items = input?.items ?? []
@@ -159,11 +159,9 @@ export default function DocumentDetailPage() {
     if (!email) return
     try {
       const result = await sendDocumentEmail(doc.id, email)
-      setStatusToast(result.message)
-      setTimeout(() => setStatusToast(null), 5000)
+      showInfo(result.message)
     } catch (err: any) {
-      setStatusToast(err.message || 'Error al enviar correo')
-      setTimeout(() => setStatusToast(null), 5000)
+      showError(err.message || 'Error al enviar correo')
     }
   }
 
@@ -257,15 +255,6 @@ export default function DocumentDetailPage() {
 
   return (
     <div>
-      {/* Status change toast */}
-      {statusToast && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2 bg-card border rounded-lg shadow-lg px-4 py-3 flex items-center gap-2 max-w-sm">
-          <RefreshCw className="h-4 w-4 text-primary shrink-0" />
-          <span className="text-sm">{statusToast}</span>
-          <button onClick={() => setStatusToast(null)} className="text-muted-foreground hover:text-foreground ml-2">&times;</button>
-        </div>
-      )}
-
       <Breadcrumbs items={[
         { label: 'Documentos', href: '/documents' },
         { label: doc.documentId },

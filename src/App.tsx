@@ -24,6 +24,7 @@ import AdminTenants from './pages/admin/AdminTenants'
 import AdminRevenue from './pages/admin/AdminRevenue'
 import AdminLayout from './pages/admin/AdminLayout'
 import { AppLayout } from './components/layout/AppLayout'
+import { ToastContainer } from './components/ui/toast'
 import { useAuthStore } from './stores/auth.store'
 import { useOnboarding } from './hooks/useOnboarding'
 
@@ -62,6 +63,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ToastContainer />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

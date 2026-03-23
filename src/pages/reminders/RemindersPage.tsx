@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Bell, Pencil, X, Info, Clock, CalendarCheck, CalendarClock, CheckCircle, AlertCircle } from 'lucide-react'
+import { Bell, Pencil, X, Info, Clock, CalendarCheck, CalendarClock } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -49,38 +50,10 @@ const TEMPLATE_VARIABLES = [
   { variable: '{dueDate}', description: 'Fecha de vencimiento' },
 ]
 
-interface ToastState {
-  message: string
-  type: 'success' | 'error'
-}
-
-function Toast({ message, type, onClose }: ToastState & { onClose: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000)
-    return () => clearTimeout(timer)
-  }, [onClose])
-
-  return (
-    <div className="fixed top-4 right-4 z-[60] flex items-center gap-2 rounded-lg border bg-background px-4 py-3 shadow-lg animate-in fade-in slide-in-from-top-2">
-      {type === 'success' ? (
-        <CheckCircle className="h-4 w-4 text-green-600" />
-      ) : (
-        <AlertCircle className="h-4 w-4 text-destructive" />
-      )}
-      <span className="text-sm font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 text-muted-foreground hover:text-foreground">
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  )
-}
-
 export default function RemindersPage() {
   const queryClient = useQueryClient()
+  const { success: showSuccess, error: showError } = useToast()
   const [editingConfig, setEditingConfig] = useState<ReminderConfig | null>(null)
-  const [toast, setToast] = useState<ToastState | null>(null)
-
-  const clearToast = useCallback(() => setToast(null), [])
 
   const { data: configs, isLoading } = useQuery({
     queryKey: ['reminder-configs'],
@@ -92,10 +65,10 @@ export default function RemindersPage() {
       updateReminderConfig(id, { isActive }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reminder-configs'] })
-      setToast({ message: 'Estado del recordatorio actualizado', type: 'success' })
+      showSuccess('Estado del recordatorio actualizado')
     },
     onError: (err: Error) => {
-      setToast({ message: err.message, type: 'error' })
+      showError(err.message)
     },
   })
 
@@ -105,10 +78,10 @@ export default function RemindersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reminder-configs'] })
       setEditingConfig(null)
-      setToast({ message: 'Plantilla de recordatorio actualizada', type: 'success' })
+      showSuccess('Plantilla de recordatorio actualizada')
     },
     onError: (err: Error) => {
-      setToast({ message: err.message, type: 'error' })
+      showError(err.message)
     },
   })
 
@@ -118,8 +91,6 @@ export default function RemindersPage() {
 
   return (
     <div>
-      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
         <div>
