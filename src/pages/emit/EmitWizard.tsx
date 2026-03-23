@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard'
 import { useMutation } from '@tanstack/react-query'
 import { CheckCircle2, XCircle, AlertTriangle, Plus, Trash2, Loader2, FileText, RotateCcw, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -308,6 +309,19 @@ export default function EmitWizard({ config }: EmitWizardProps) {
     mutationFn: config.emitFn,
     onSuccess: (data) => setEmitResult(data),
   })
+
+  // Block navigation when form has been touched (but not after successful emit)
+  const isDirty = useMemo(() => {
+    if (emitResult) return false
+    const initial = createInitialState(config)
+    return (
+      form.customerDocNumber !== initial.customerDocNumber ||
+      form.customerName !== initial.customerName ||
+      form.items.some((item) => item.description !== '' || item.unitPrice !== 0)
+    )
+  }, [form, emitResult, config])
+
+  useUnsavedChangesGuard(isDirty)
 
   // Derived totals for items
   const totals = useMemo(() => calcDocumentTotals(form.items), [form.items])
