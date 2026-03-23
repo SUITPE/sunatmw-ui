@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +20,12 @@ export default function LoginPage() {
   const location = useLocation()
   const verificationSuccess = (location.state as { verificationSuccess?: boolean })?.verificationSuccess
   const storeLogin = useAuthStore((s) => s.login)
+  const sessionExpired = useAuthStore((s) => s.sessionExpired)
+  const clearSessionExpired = useAuthStore((s) => s.clearSessionExpired)
+
+  useEffect(() => {
+    return () => clearSessionExpired()
+  }, [clearSessionExpired])
 
   const [ruc, setRuc] = useState('')
   const [email, setEmail] = useState('')
@@ -137,6 +143,13 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} aria-label="Formulario de inicio de sesion">
+              {sessionExpired && (
+                <Alert variant="destructive" className="mb-4">
+                  <LogOut className="h-4 w-4" />
+                  <AlertDescription>Tu sesion ha expirado. Inicia sesion nuevamente.</AlertDescription>
+                </Alert>
+              )}
+
               {verificationSuccess && (
                 <Alert className="mb-4">
                   <CheckCircle2 className="h-4 w-4" />
