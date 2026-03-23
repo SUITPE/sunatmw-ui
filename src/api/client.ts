@@ -28,7 +28,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
       headers.set('Authorization', `Bearer ${newToken}`)
       response = await fetch(`${API_URL}${url}`, { ...options, headers })
     } else {
-      logout()
+      logout({ sessionExpired: true })
       throw new Error('Session expired')
     }
   }
