@@ -144,7 +144,7 @@ export default function DocumentListPage() {
             {hasFilters ? 'No se encontraron documentos' : 'Aun no tienes documentos'}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {hasFilters ? 'Intenta modificar los filtros de busqueda' : 'Emite tu primer comprobante electronico'}
+            {hasFilters ? 'Intenta modificar los filtros de búsqueda' : 'Emite tu primer comprobante electronico'}
           </p>
           {hasFilters ? (
             <Button variant="outline" className="mt-4" onClick={clearFilters}>Limpiar filtros</Button>
