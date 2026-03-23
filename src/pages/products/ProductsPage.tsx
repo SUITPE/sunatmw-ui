@@ -225,7 +225,7 @@ export default function ProductsPage() {
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch || filterCategory || filterIgvType
-              ? 'Intenta modificar los filtros de busqueda'
+              ? 'Intenta modificar los filtros de búsqueda'
               : 'Crea el primer producto de tu empresa'}
           </p>
           {debouncedSearch || filterCategory || filterIgvType ? (
@@ -768,7 +768,7 @@ function DeactivateModal({ product, error, isLoading, onClose, onConfirm }: Deac
             Esta seguro que desea desactivar <span className="font-medium text-foreground">{product.name}</span>?
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            El producto no aparecera en las busquedas de documentos.
+            El producto no aparecera en las búsquedas de documentos.
           </p>
 
           {error && (

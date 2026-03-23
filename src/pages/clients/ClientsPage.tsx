@@ -701,7 +701,7 @@ function DeactivateModal({ client, error, isLoading, onClose, onConfirm }: Deact
             Esta seguro que desea desactivar a <span className="font-medium text-foreground">{client.name}</span>?
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            El cliente no aparecera en las busquedas de documentos.
+            El cliente no aparecera en las búsquedas de documentos.
           </p>
 
           {error && (

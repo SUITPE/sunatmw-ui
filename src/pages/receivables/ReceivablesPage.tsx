@@ -304,7 +304,7 @@ export default function ReceivablesPage() {
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {statusFilter || fromDate || toDate
-              ? 'Intenta modificar los filtros de busqueda'
+              ? 'Intenta modificar los filtros de búsqueda'
               : 'Las cuentas por cobrar se crean automaticamente al emitir facturas'}
           </p>
           {(statusFilter || fromDate || toDate) && (
