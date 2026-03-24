@@ -161,7 +161,7 @@ export default function DocumentDetailPage() {
       const result = await sendDocumentEmail(doc.id, email)
       showInfo(result.message)
     } catch (err: any) {
-      showError(err.message || 'Error al enviar correo')
+      showError('Error al enviar el correo electrónico')
     }
   }
 
@@ -172,8 +172,7 @@ export default function DocumentDetailPage() {
       await checkTicket(doc.id)
       queryClient.invalidateQueries({ queryKey: ['document', id] })
     } catch (err) {
-      setStatusToast(err instanceof Error ? err.message : 'Error al consultar ticket')
-      setTimeout(() => setStatusToast(null), 5000)
+      showError('Error al consultar el estado del ticket')
     } finally {
       setIsCheckingTicket(false)
     }
