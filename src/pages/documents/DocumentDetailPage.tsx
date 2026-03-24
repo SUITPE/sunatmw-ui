@@ -172,8 +172,7 @@ export default function DocumentDetailPage() {
       await checkTicket(doc.id)
       queryClient.invalidateQueries({ queryKey: ['document', id] })
     } catch (err) {
-      setStatusToast(err instanceof Error ? err.message : 'Error al consultar ticket')
-      setTimeout(() => setStatusToast(null), 5000)
+      showError(err instanceof Error ? err.message : 'Error al consultar ticket')
     } finally {
       setIsCheckingTicket(false)
     }
