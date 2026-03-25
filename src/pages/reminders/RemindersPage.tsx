@@ -67,8 +67,8 @@ export default function RemindersPage() {
       queryClient.invalidateQueries({ queryKey: ['reminder-configs'] })
       showSuccess('Estado del recordatorio actualizado')
     },
-    onError: (err: Error) => {
-      showError(err.message)
+    onError: () => {
+      showError('Error al actualizar el estado del recordatorio')
     },
   })
 
@@ -80,8 +80,8 @@ export default function RemindersPage() {
       setEditingConfig(null)
       showSuccess('Plantilla de recordatorio actualizada')
     },
-    onError: (err: Error) => {
-      showError(err.message)
+    onError: () => {
+      showError('Error al actualizar la plantilla de recordatorio')
     },
   })
 

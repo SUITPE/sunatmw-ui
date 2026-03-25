@@ -8,6 +8,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuthStore } from '@/stores/auth.store'
 import { login as apiLogin } from '@/api/auth'
+import { useToast } from '@/hooks/useToast'
 
 interface FormErrors {
   ruc?: string
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const storeLogin = useAuthStore((s) => s.login)
   const sessionExpired = useAuthStore((s) => s.sessionExpired)
   const clearSessionExpired = useAuthStore((s) => s.clearSessionExpired)
+  const { info: showInfo } = useToast()
 
   useEffect(() => {
     return () => clearSessionExpired()
@@ -114,7 +116,7 @@ export default function LoginPage() {
 
   const handleForgotPassword = () => {
     setApiError(null)
-    alert('Contacta al administrador de tu empresa para restablecer tu contrasena.')
+    showInfo('Contacta al administrador de tu empresa para restablecer tu contraseña.')
   }
 
   return (
